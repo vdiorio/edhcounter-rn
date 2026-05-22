@@ -34,6 +34,8 @@ function makeFullState(): GameStore {
     setNumPlayers: () => {},
     resetGame: () => {},
     _scheduleDeltaReset: () => {},
+    incrementLife: () => {},
+    setLife: () => {},
   };
 }
 

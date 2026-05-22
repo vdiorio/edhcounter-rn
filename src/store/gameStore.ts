@@ -1,10 +1,11 @@
 import {create} from 'zustand';
 import {persist} from 'zustand/middleware';
 import {createCoreSlice, type CoreSlice} from './coreSlice';
+import {createLifeSlice, type LifeSlice} from '@/features/life-total/slice';
 import {persistConfig} from '@/features/persistence/middleware';
 
 /**
- * The composed game store. Spec 03 lays the foundation with CoreSlice only;
+ * The composed game store. Spec 03 lays the foundation with CoreSlice;
  * Specs 07/09/10/12 extend the type and composition with their own slices.
  *
  * When adding a new slice:
@@ -13,12 +14,13 @@ import {persistConfig} from '@/features/persistence/middleware';
  *  3. Update partializeGameState (in features/persistence/middleware.ts) to
  *     allow-list any new fields that should round-trip across restarts.
  */
-export type GameStore = CoreSlice;
+export type GameStore = CoreSlice & LifeSlice;
 
 export const useGameStore = create<GameStore>()(
   persist(
     (set, get, store) => ({
       ...createCoreSlice(set, get, store),
+      ...createLifeSlice(set, get, store),
     }),
     persistConfig,
   ),
