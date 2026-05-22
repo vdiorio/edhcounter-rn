@@ -81,22 +81,30 @@ describe('GameScreen hardware back', () => {
   });
 
   it('confirm "Yes" calls resetGame and navigates to LayoutSelector', async () => {
-    const {findByTestId, queryByTestId} = render(<TestApp />);
-    await findByTestId('screen-game');
-
+    const resetSpy = jest.fn();
+    const originalReset = useGameStore.getState().resetGame;
     act(() => {
-      useGameStore.setState({numPlayers: 7});
+      useGameStore.setState({resetGame: resetSpy});
     });
 
-    act(() => {
-      fireHardwareBack();
-    });
+    try {
+      const {findByTestId, queryByTestId} = render(<TestApp />);
+      await findByTestId('screen-game');
 
-    const yesBtn = await findByTestId('confirm-back-yes');
-    fireEvent.press(yesBtn);
+      act(() => {
+        fireHardwareBack();
+      });
 
-    await findByTestId('screen-layout-selector');
-    expect(useGameStore.getState().numPlayers).toBe(0);
-    expect(queryByTestId('screen-game')).toBeNull();
+      const yesBtn = await findByTestId('confirm-back-yes');
+      fireEvent.press(yesBtn);
+
+      await findByTestId('screen-layout-selector');
+      expect(resetSpy).toHaveBeenCalledTimes(1);
+      expect(queryByTestId('screen-game')).toBeNull();
+    } finally {
+      act(() => {
+        useGameStore.setState({resetGame: originalReset});
+      });
+    }
   });
 });

@@ -1,26 +1,17 @@
 import {create} from 'zustand';
+import {createCoreSlice, type CoreSlice} from './coreSlice';
 
 /**
- * Stub implementation — Spec 03 (game-store-core) will replace this with the
- * composed slice-based store. App-shell-level callers (Spec 02) only need
- * resetGame and setNumPlayers to exist.
+ * The composed game store. Spec 03 lays the foundation with CoreSlice only;
+ * Specs 07/09/10/12 extend the type and composition with their own slices.
+ *
+ * When adding a new slice:
+ *  1. Extend the `GameStore` intersection with the slice's type.
+ *  2. Spread `createXSlice(set, get, store)` into the composer below.
+ *  3. (Spec 04) Update persistConfig to whitelist/blacklist any new fields.
  */
-export type SetNumPlayersArgs = {
-  playerCount: number;
-  alt?: boolean;
-};
+export type GameStore = CoreSlice;
 
-export type GameStore = {
-  numPlayers: number;
-  alt: boolean;
-  setNumPlayers: (args: SetNumPlayersArgs) => void;
-  resetGame: () => void;
-};
-
-export const useGameStore = create<GameStore>(set => ({
-  numPlayers: 0,
-  alt: false,
-  setNumPlayers: ({playerCount, alt = false}) =>
-    set({numPlayers: playerCount, alt}),
-  resetGame: () => set({numPlayers: 0, alt: false}),
+export const useGameStore = create<GameStore>()((set, get, store) => ({
+  ...createCoreSlice(set, get, store),
 }));
