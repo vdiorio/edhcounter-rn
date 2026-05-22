@@ -125,3 +125,29 @@ jest.mock('react-native-system-navigation-bar', () => ({
 jest.mock('react-native-vector-icons/Ionicons', () => 'Icon');
 jest.mock('react-native-vector-icons/MaterialCommunityIcons', () => 'Icon');
 jest.mock('react-native-vector-icons/FontAwesome5', () => 'Icon');
+
+// safe-area-context — render children directly in tests
+jest.mock('react-native-safe-area-context', () => {
+  const React = require('react');
+  const { View } = require('react-native');
+  const inset = { top: 0, right: 0, bottom: 0, left: 0 };
+  const frame = { x: 0, y: 0, width: 0, height: 0 };
+  return {
+    SafeAreaProvider: ({ children }) => React.createElement(View, null, children),
+    SafeAreaConsumer: ({ children }) => children(inset),
+    SafeAreaView: ({ children, ...props }) => React.createElement(View, props, children),
+    SafeAreaInsetsContext: { Consumer: ({ children }) => children(inset) },
+    useSafeAreaInsets: () => inset,
+    useSafeAreaFrame: () => frame,
+    initialWindowMetrics: { insets: inset, frame },
+  };
+});
+
+// react-native-keep-awake — stub the NativeModules call site
+jest.mock('react-native-keep-awake', () => ({
+  __esModule: true,
+  default: {
+    activate: jest.fn(),
+    deactivate: jest.fn(),
+  },
+}));
