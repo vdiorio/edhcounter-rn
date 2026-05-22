@@ -1,10 +1,14 @@
 import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, StatusBar, Platform } from 'react-native';
 import BootSplash from 'react-native-bootsplash';
+import SystemNavigationBar from 'react-native-system-navigation-bar';
 
 export default function App(): React.JSX.Element {
   useEffect(() => {
     BootSplash.hide({ fade: true });
+    if (Platform.OS === 'android') {
+      SystemNavigationBar.setNavigationColor('#1e1d22', 'dark');
+    }
   }, []);
 
   return (

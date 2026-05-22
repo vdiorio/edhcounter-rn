@@ -3,3 +3,8 @@ jest.mock('react-native-bootsplash', () => ({
   show: jest.fn().mockResolvedValue(undefined),
   isVisible: jest.fn().mockResolvedValue(false),
 }));
+
+jest.mock('react-native-system-navigation-bar', () => ({
+  setNavigationColor: jest.fn(),
+  setBarMode: jest.fn(),
+}));
