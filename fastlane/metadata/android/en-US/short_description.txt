@@ -1,0 +1,1 @@
+Life tracker for EDH / Commander — supports 2–6 players with all counters

@@ -1,0 +1,49 @@
+Categories:
+  - Games
+License: MIT
+# TODO: update these URLs once the edhcounter-rn repo is published on GitHub
+SourceCode: https://github.com/vdiorio/edhcounter-rn
+IssueTracker: https://github.com/vdiorio/edhcounter-rn/issues
+
+AutoName: EdhCounter
+
+RepoType: git
+Repo: https://github.com/vdiorio/edhcounter-rn.git
+
+# NOTE: Builds from the old EdhCounterRefactor repo (versionCodes 17-20) are
+# intentionally omitted here because those commits live in a different repository.
+# Add the first edhcounter-rn build entry once the new repo's first release
+# commit is known, following the same pattern as the old entries below.
+#
+# Example template for next release:
+#   - versionName: 1.0.21
+#     versionCode: 21
+#     commit: <git SHA of the tagged release commit in edhcounter-rn>
+#     subdir: android
+#     sudo:
+#       - sysctl fs.inotify.max_user_watches=524288 || true
+#       - apt-get update
+#       - apt-get install -y npm
+#     init:
+#       - cd ..
+#       - npm ci
+#       - npx patch-package
+#     gradle:
+#       - yes
+#     output: app/build/outputs/apk/release/*.apk
+#     scanignore:
+#       - node_modules/react-native/sdks/hermesc
+#     scandelete:
+#       - node_modules
+
+Builds: []
+
+# TODO: update Binaries URL once first release is published from edhcounter-rn
+Binaries: https://github.com/vdiorio/edhcounter-rn/releases/download/v%v/app-release.apk
+AllowedAPKSigningKeys: fac61745dc0903786fb9ede62a962b399f7348f0bb6f899b8332667591033b9c
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+# TODO: bump CurrentVersion / CurrentVersionCode with the first edhcounter-rn release
+CurrentVersion: 1.0.20
+CurrentVersionCode: 20

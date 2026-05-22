@@ -1,0 +1,12 @@
+EDH Counter is a life tracking app for EDH (Magic: The Gathering Commander) games.
+
+Features:
+• Supports 2–6 players
+• Tracks life totals with tap and hold-to-repeat buttons
+• Commander damage tracking per opponent (with partner commander support)
+• Poison, energy, and experience counters
+• Life history log per player
+• Monarch and initiative tracking
+• Multiple table layout options
+• Starting player selector with weighted randomization
+• No account required — fully offline, no tracking, no ads

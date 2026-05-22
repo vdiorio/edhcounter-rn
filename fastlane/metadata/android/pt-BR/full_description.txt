@@ -1,0 +1,11 @@
+EDH Counter
+Contador de vida para EDH / Commander — suporta 2–6
+
+EDH Counter é um aplicativo de rastreamento de vida para partidas de EDH (Commander de Magic: The Gathering).
+
+Funcionalidades:
+• Rastreamento de dano de comandante
+• Histórico de vida por jogador
+• Rastreamento de monarca e iniciativa
+• Múltiplas opções de layout de mesa
+• Totalmente offline, sem rastreamento, sem anúncios

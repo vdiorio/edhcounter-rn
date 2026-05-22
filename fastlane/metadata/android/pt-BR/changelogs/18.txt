@@ -1,0 +1,1 @@
+Reduz o tamanho do download no Android com split por ABI e limpeza das fontes de icones.
