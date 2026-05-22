@@ -5,12 +5,24 @@ import KeepAwake from 'react-native-keep-awake';
 import {useTranslation} from 'react-i18next';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {AppModal, Typography} from '@/shared/ui';
-import {useAppColors} from '@/features/theming';
+import {useAppColors, usePlayerColor} from '@/features/theming';
 import {useGameStore} from '@/store/gameStore';
+import {Lifetotal} from '@/features/life-total';
+import {IncrementerButtons} from '@/features/increment-buttons';
 import type {RootStackParamList} from '@/app/navigation/types';
 
 type GameNavProp = NativeStackNavigationProp<RootStackParamList, 'Game'>;
 type GameRouteProp = RouteProp<RootStackParamList, 'Game'>;
+
+function PlayerCell({playerId}: {playerId: number}): React.JSX.Element {
+  const color = usePlayerColor(playerId);
+  return (
+    <View style={[styles.playerCell, {borderColor: color}]}>
+      <Lifetotal playerId={playerId} />
+      <IncrementerButtons playerId={playerId} />
+    </View>
+  );
+}
 
 export default function GameScreen(): React.JSX.Element {
   const navigation = useNavigation<GameNavProp>();
@@ -19,6 +31,7 @@ export default function GameScreen(): React.JSX.Element {
   const colors = useAppColors();
   const setNumPlayers = useGameStore(s => s.setNumPlayers);
   const resetGame = useGameStore(s => s.resetGame);
+  const numPlayers = useGameStore(s => s.numPlayers);
 
   const [confirmVisible, setConfirmVisible] = useState(false);
 
@@ -52,7 +65,12 @@ export default function GameScreen(): React.JSX.Element {
     <View
       testID="screen-game"
       style={[styles.root, {backgroundColor: colors.background}]}>
-      <Typography variant="title">Game ({route.params.numPlayers})</Typography>
+      <View style={styles.grid}>
+        {Array.from({length: numPlayers}, (_, i) => (
+          <PlayerCell key={i} playerId={i} />
+        ))}
+      </View>
+
       <AppModal
         visible={confirmVisible}
         onRequestClose={onCancel}
@@ -72,7 +90,21 @@ export default function GameScreen(): React.JSX.Element {
 }
 
 const styles = StyleSheet.create({
-  root: {flex: 1, alignItems: 'center', justifyContent: 'center'},
+  root: {flex: 1},
+  grid: {
+    flex: 1,
+    flexDirection: 'column',
+  },
+  playerCell: {
+    flex: 1,
+    borderWidth: 2,
+    margin: 4,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+    overflow: 'hidden',
+  },
   modalMessage: {marginBottom: 16, textAlign: 'center'},
   modalActions: {flexDirection: 'row', justifyContent: 'space-around'},
   modalButton: {padding: 12},
