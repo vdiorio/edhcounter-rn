@@ -1,0 +1,14 @@
+export const LIFE_FONT_SIZE = 48;
+export const DELTA_FACTOR = 0.333;
+export const ICON_FACTOR = 0.25;
+export const STANDARD_DURATION = 300;
+export const INITIAL_DELAY = 700;
+export const ENTRY_FADE = 1000;
+export const DELTA_ANIMATION = 100;
+export const OPACITY_TRANSITION = 200;
+export const HOLD_INTERVAL = 100;
+export const AUTO_ADJUST = 600;
+export const SLIDER_TOGGLE = 300;
+export const BORDER_COLOR = '#555555';
+export const DEFAULT_PLAYER_COLOR = '#00c1f1';
+export const CHAIN_ACTIVE_COLOR = '#70e700ff';

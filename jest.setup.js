@@ -1,20 +1,52 @@
-// Reanimated mock
+// Reanimated mock — Reanimated 4 ships its mock as TS only, so we cannot
+// require('react-native-reanimated/mock') from Jest without ts-node. Provide
+// a manual mock that swaps Animated.<Text|View|...> for plain RN components
+// and stubs the worklets API surface that components touch at test time.
 jest.mock('react-native-reanimated', () => {
-  try {
-    return require('react-native-reanimated/mock');
-  } catch (e) {
-    // Reanimated 4 may not ship the legacy mock — provide a minimal stub
-    return {
-      default: {},
-      useSharedValue: (v) => ({ value: v }),
-      useAnimatedStyle: (fn) => fn(),
-      withTiming: (v) => v,
-      withSpring: (v) => v,
-      withDelay: (_, v) => v,
-      runOnJS: (fn) => fn,
-      Easing: { linear: (t) => t, ease: (t) => t },
-    };
-  }
+  const RN = require('react-native');
+  const View = RN.View;
+  const Text = RN.Text;
+  const Image = RN.Image;
+  const ScrollView = RN.ScrollView;
+  const FlatList = RN.FlatList;
+  const Animated = {
+    View,
+    Text,
+    Image,
+    ScrollView,
+    FlatList,
+    createAnimatedComponent: (c) => c,
+  };
+  const useSharedValue = (v) => ({ value: v });
+  const useDerivedValue = (fn) => ({ value: fn() });
+  const useAnimatedStyle = (fn) => fn();
+  const useAnimatedProps = (fn) => fn();
+  const passthrough = (v) => v;
+  return {
+    __esModule: true,
+    default: Animated,
+    ...Animated,
+    useSharedValue,
+    useDerivedValue,
+    useAnimatedStyle,
+    useAnimatedProps,
+    withTiming: passthrough,
+    withSpring: passthrough,
+    withDelay: (_d, v) => v,
+    withRepeat: passthrough,
+    withSequence: (...xs) => xs[xs.length - 1],
+    cancelAnimation: () => {},
+    runOnJS: (fn) => fn,
+    runOnUI: (fn) => fn,
+    interpolate: (value, _input, output) => output[0],
+    interpolateColor: (value, _input, output) => output[0],
+    Easing: {
+      linear: (t) => t,
+      ease: (t) => t,
+      inOut: (fn) => fn,
+      bezier: () => (t) => t,
+    },
+  };
 });
 
 // Worklets mock (Reanimated 4 dependency)
