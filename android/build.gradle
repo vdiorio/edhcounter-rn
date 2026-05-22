@@ -19,3 +19,29 @@ buildscript {
 }
 
 apply plugin: "com.facebook.react.rootproject"
+
+subprojects { subproject ->
+    def pinAndroidJava17 = {
+        def androidComponents = subproject.extensions
+            .findByType(com.android.build.api.variant.AndroidComponentsExtension)
+        if (androidComponents != null) {
+            androidComponents.finalizeDsl { ext ->
+                ext.compileOptions.sourceCompatibility = JavaVersion.VERSION_17
+                ext.compileOptions.targetCompatibility = JavaVersion.VERSION_17
+            }
+        }
+    }
+    subproject.plugins.withId("com.android.application", pinAndroidJava17)
+    subproject.plugins.withId("com.android.library", pinAndroidJava17)
+
+    subproject.tasks.withType(JavaCompile).configureEach {
+        sourceCompatibility = JavaVersion.VERSION_17.toString()
+        targetCompatibility = JavaVersion.VERSION_17.toString()
+    }
+
+    subproject.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            jvmTarget = "17"
+        }
+    }
+}
