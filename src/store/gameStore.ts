@@ -1,5 +1,7 @@
 import {create} from 'zustand';
+import {persist} from 'zustand/middleware';
 import {createCoreSlice, type CoreSlice} from './coreSlice';
+import {persistConfig} from '@/features/persistence/middleware';
 
 /**
  * The composed game store. Spec 03 lays the foundation with CoreSlice only;
@@ -8,10 +10,16 @@ import {createCoreSlice, type CoreSlice} from './coreSlice';
  * When adding a new slice:
  *  1. Extend the `GameStore` intersection with the slice's type.
  *  2. Spread `createXSlice(set, get, store)` into the composer below.
- *  3. (Spec 04) Update persistConfig to whitelist/blacklist any new fields.
+ *  3. Update partializeGameState (in features/persistence/middleware.ts) to
+ *     allow-list any new fields that should round-trip across restarts.
  */
 export type GameStore = CoreSlice;
 
-export const useGameStore = create<GameStore>()((set, get, store) => ({
-  ...createCoreSlice(set, get, store),
-}));
+export const useGameStore = create<GameStore>()(
+  persist(
+    (set, get, store) => ({
+      ...createCoreSlice(set, get, store),
+    }),
+    persistConfig,
+  ),
+);
