@@ -59,17 +59,19 @@ jest.mock('react-native-gesture-handler', () => {
   };
 });
 
-// AsyncStorage mock
+// AsyncStorage mock (v3.x ships the mock at the /jest subpath export)
 jest.mock('@react-native-async-storage/async-storage', () =>
-  require('@react-native-async-storage/async-storage/jest/async-storage-mock'),
+  require('@react-native-async-storage/async-storage/jest'),
 );
 
-// react-native-localize mock
+// react-native-localize mock — use jest.fn so tests can override return values
 jest.mock('react-native-localize', () => ({
-  getLocales: () => [{ countryCode: 'US', languageTag: 'en-US', languageCode: 'en', isRTL: false }],
-  getCurrencies: () => ['USD'],
-  getCountry: () => 'US',
-  getTimeZone: () => 'America/Los_Angeles',
+  getLocales: jest.fn(() => [
+    { countryCode: 'US', languageTag: 'en-US', languageCode: 'en', isRTL: false },
+  ]),
+  getCurrencies: jest.fn(() => ['USD']),
+  getCountry: jest.fn(() => 'US'),
+  getTimeZone: jest.fn(() => 'America/Los_Angeles'),
   addEventListener: jest.fn(),
   removeEventListener: jest.fn(),
 }));
