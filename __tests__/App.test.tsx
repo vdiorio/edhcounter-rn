@@ -1,13 +1,8 @@
-/**
- * @format
- */
-
 import React from 'react';
-import ReactTestRenderer from 'react-test-renderer';
-import App from '../App';
+import { render, screen } from '@testing-library/react-native';
+import App from '@/App';
 
-test('renders correctly', async () => {
-  await ReactTestRenderer.act(() => {
-    ReactTestRenderer.create(<App />);
-  });
+test('App renders without crashing', () => {
+  render(<App />);
+  expect(screen.getByTestId('app-root')).toBeTruthy();
 });
