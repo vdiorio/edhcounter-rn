@@ -1,9 +1,11 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
 import {DamageAllButton} from '@/features/damage-all';
+import {Confetti} from '@/features/starting-player-wheel';
 import {usePlayerColor} from '@/features/theming';
 import {Lifetotal} from '@/features/life-total';
 import {IncrementerButtons} from '@/features/increment-buttons';
+import {useGameStore} from '@/store/gameStore';
 
 type Props = {
   playerId: number;
@@ -18,12 +20,28 @@ type Props = {
  */
 export function PlayerPiece({playerId, width, height}: Props): React.JSX.Element {
   const playerColor = usePlayerColor(playerId);
+  const startingPlayerId = useGameStore(s => s.startingPlayerId);
+  const [confettiActive, setConfettiActive] = React.useState(false);
+
+  React.useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    if (startingPlayerId === playerId) {
+      timer = setTimeout(() => setConfettiActive(true), 230);
+    } else {
+      setConfettiActive(false);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [startingPlayerId, playerId]);
+
   return (
     <View
       style={[
         styles.root,
         {width, height, borderColor: playerColor},
       ]}>
+      <Confetti active={confettiActive} />
       <View style={styles.damageAllButton}>
         <DamageAllButton playerId={playerId} />
       </View>

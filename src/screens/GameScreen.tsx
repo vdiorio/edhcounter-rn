@@ -7,6 +7,7 @@ import {useTranslation} from 'react-i18next';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {AppModal, Typography} from '@/shared/ui';
 import {useAppColors} from '@/features/theming';
+import {StartingPlayerButton} from '@/features/starting-player-wheel';
 import {useGameStore} from '@/store/gameStore';
 import {LayoutGenerator, PlayerPiece} from '@/features/game-layout';
 import type {RootStackParamList} from '@/app/navigation/types';
@@ -67,6 +68,8 @@ export default function GameScreen(): React.JSX.Element {
           <PlayerPiece playerId={playerId} width={width} height={height} />
         )}
       />
+
+      <StartingPlayerButton />
 
       <AppModal
         visible={confirmVisible}
