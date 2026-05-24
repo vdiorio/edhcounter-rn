@@ -1,5 +1,6 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
+import {DamageAllButton} from '@/features/damage-all';
 import {usePlayerColor} from '@/features/theming';
 import {Lifetotal} from '@/features/life-total';
 import {IncrementerButtons} from '@/features/increment-buttons';
@@ -23,6 +24,9 @@ export function PlayerPiece({playerId, width, height}: Props): React.JSX.Element
         styles.root,
         {width, height, borderColor: playerColor},
       ]}>
+      <View style={styles.damageAllButton}>
+        <DamageAllButton playerId={playerId} />
+      </View>
       <Lifetotal playerId={playerId} />
       <IncrementerButtons playerId={playerId} />
     </View>
@@ -37,5 +41,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'relative',
     overflow: 'hidden',
+  },
+  damageAllButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1,
   },
 });
