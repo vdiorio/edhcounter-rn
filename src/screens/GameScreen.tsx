@@ -1,7 +1,8 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {BackHandler, Pressable, StyleSheet, View} from 'react-native';
+import {BackHandler, Platform, Pressable, StatusBar, StyleSheet, View} from 'react-native';
 import {useFocusEffect, useNavigation, useRoute, type RouteProp} from '@react-navigation/native';
 import KeepAwake from 'react-native-keep-awake';
+import SystemNavigationBar from 'react-native-system-navigation-bar';
 import {useTranslation} from 'react-i18next';
 import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {AppModal, Typography} from '@/shared/ui';
@@ -30,6 +31,10 @@ export default function GameScreen(): React.JSX.Element {
   useFocusEffect(
     useCallback(() => {
       KeepAwake.activate();
+      StatusBar.setHidden(true, 'fade');
+      if (Platform.OS === 'android') {
+        SystemNavigationBar.stickyImmersive(true);
+      }
       const sub = BackHandler.addEventListener('hardwareBackPress', () => {
         setConfirmVisible(true);
         return true;
@@ -37,6 +42,10 @@ export default function GameScreen(): React.JSX.Element {
       return () => {
         sub.remove();
         KeepAwake.deactivate();
+        StatusBar.setHidden(false, 'fade');
+        if (Platform.OS === 'android') {
+          SystemNavigationBar.stickyImmersive(false);
+        }
       };
     }, []),
   );
@@ -44,7 +53,7 @@ export default function GameScreen(): React.JSX.Element {
   const onConfirm = useCallback(() => {
     setConfirmVisible(false);
     resetGame();
-    navigation.navigate('LayoutSelector');
+    navigation.popToTop();
   }, [navigation, resetGame]);
 
   const onCancel = useCallback(() => setConfirmVisible(false), []);

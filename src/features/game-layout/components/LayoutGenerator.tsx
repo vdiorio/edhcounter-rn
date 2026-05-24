@@ -1,5 +1,6 @@
 import React from 'react';
 import {StyleSheet, View} from 'react-native';
+import {PLAYER_BOX_GAP} from '@/shared/constants/ui';
 import {useLayoutGenerator} from '../hooks/useLayoutGenerator';
 import {Rotator} from './Rotator';
 import type {Direction} from '../types';
@@ -15,6 +16,8 @@ type Props = {
   renderPiece: RenderPiece;
 };
 
+const HALF_GAP = PLAYER_BOX_GAP / 2;
+
 /**
  * Computes the per-edge slot geometry from the current gameLayout and
  * absolutely positions one Rotator per slot. The caller supplies the actual
@@ -28,24 +31,26 @@ export function LayoutGenerator({renderPiece}: Props): React.JSX.Element {
     <View style={[styles.root, {width: containerWidth, height: containerHeight}]}>
       {pieces.map(piece => {
         const sideways = piece.direction === 90 || piece.direction === -90;
-        const innerWidth = sideways ? piece.height : piece.width;
-        const innerHeight = sideways ? piece.width : piece.height;
+        const insetWidth = Math.max(0, piece.width - PLAYER_BOX_GAP);
+        const insetHeight = Math.max(0, piece.height - PLAYER_BOX_GAP);
+        const innerWidth = sideways ? insetHeight : insetWidth;
+        const innerHeight = sideways ? insetWidth : insetHeight;
         return (
           <View
             key={piece.playerId}
             style={[
               styles.slot,
               {
-                left: piece.x,
-                top: piece.y,
-                width: piece.width,
-                height: piece.height,
+                left: piece.x + HALF_GAP,
+                top: piece.y + HALF_GAP,
+                width: insetWidth,
+                height: insetHeight,
               },
             ]}>
             <Rotator
               direction={piece.direction}
-              width={piece.width}
-              height={piece.height}>
+              width={insetWidth}
+              height={insetHeight}>
               {renderPiece({
                 playerId: piece.playerId,
                 direction: piece.direction,

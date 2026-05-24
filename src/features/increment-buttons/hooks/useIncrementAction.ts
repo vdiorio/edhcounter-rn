@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useRef} from 'react';
-import {HOLD_INTERVAL} from '@/shared/constants/ui';
+import {HOLD_INTERVAL, LONG_PRESS_DELAY} from '@/shared/constants/ui';
 
 export type IncrementAction = {
   onPress: () => void;
@@ -10,42 +10,56 @@ export type IncrementAction = {
 export function useIncrementAction(input: {
   onTick: () => void;
   intervalMs?: number;
+  longPressDelayMs?: number;
 }): IncrementAction {
-  const {onTick, intervalMs = HOLD_INTERVAL} = input;
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  // Track the latest callback so the interval always calls the freshest one.
+  const {
+    onTick,
+    intervalMs = HOLD_INTERVAL,
+    longPressDelayMs = LONG_PRESS_DELAY,
+  } = input;
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pressInFiredRef = useRef(false);
   const onTickRef = useRef(onTick);
   onTickRef.current = onTick;
 
-  const clear = useCallback(() => {
-    if (timerRef.current !== null) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
+  const clearTimers = useCallback(() => {
+    if (intervalRef.current !== null) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    if (timeoutRef.current !== null) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
     }
   }, []);
 
   const onPressIn = useCallback(() => {
-    clear();
+    clearTimers();
+    pressInFiredRef.current = true;
     onTickRef.current();
-    timerRef.current = setInterval(() => {
+    timeoutRef.current = setTimeout(() => {
       onTickRef.current();
-    }, intervalMs);
-  }, [clear, intervalMs]);
+      intervalRef.current = setInterval(() => {
+        onTickRef.current();
+      }, intervalMs);
+    }, longPressDelayMs);
+  }, [clearTimers, intervalMs, longPressDelayMs]);
 
   const onPressOut = useCallback(() => {
-    clear();
-  }, [clear]);
+    clearTimers();
+  }, [clearTimers]);
 
   const onPress = useCallback(() => {
-    // If a hold already fired, the tap is redundant. The button wires onPress
-    // for the case where the platform delivered a tap without a press-in/out
-    // (rare). Fire if no interval is active.
-    if (timerRef.current === null) {
+    // Fallback for the platform-skipped-pressIn case (test renderers, mostly).
+    // On a normal device flow the flag is already true here so we no-op.
+    if (!pressInFiredRef.current) {
       onTickRef.current();
     }
+    pressInFiredRef.current = false;
   }, []);
 
-  useEffect(() => () => clear(), [clear]);
+  useEffect(() => () => clearTimers(), [clearTimers]);
 
   return {onPressIn, onPressOut, onPress};
 }

@@ -1,6 +1,8 @@
 import {renderHook, act} from '@testing-library/react-native';
 import {useIncrementAction} from '../hooks/useIncrementAction';
 
+const HOOK_OPTS = {intervalMs: 100, longPressDelayMs: 350};
+
 describe('useIncrementAction', () => {
   beforeEach(() => {
     jest.useFakeTimers();
@@ -9,78 +11,99 @@ describe('useIncrementAction', () => {
     jest.useRealTimers();
   });
 
-  it('onPress fires onTick exactly once (tap, no hold)', () => {
+  it('onPress fires onTick once when the platform skipped onPressIn (tap fallback)', () => {
     const onTick = jest.fn();
-    const {result} = renderHook(() => useIncrementAction({onTick}));
+    const {result} = renderHook(() => useIncrementAction({onTick, ...HOOK_OPTS}));
     act(() => {
       result.current.onPress();
     });
     expect(onTick).toHaveBeenCalledTimes(1);
   });
 
-  it('hold fires onTick once immediately and then every intervalMs', () => {
+  it('onPressIn + onPress (real device tap order) fires onTick only once', () => {
     const onTick = jest.fn();
-    const {result} = renderHook(() =>
-      useIncrementAction({onTick, intervalMs: 100}),
-    );
+    const {result} = renderHook(() => useIncrementAction({onTick, ...HOOK_OPTS}));
+    act(() => {
+      result.current.onPressIn();
+      result.current.onPressOut();
+      result.current.onPress();
+    });
+    expect(onTick).toHaveBeenCalledTimes(1);
+  });
+
+  it('press-in fires once immediately and nothing else until the long-press delay elapses', () => {
+    const onTick = jest.fn();
+    const {result} = renderHook(() => useIncrementAction({onTick, ...HOOK_OPTS}));
     act(() => {
       result.current.onPressIn();
     });
-    expect(onTick).toHaveBeenCalledTimes(1); // immediate fire on press-in
+    expect(onTick).toHaveBeenCalledTimes(1);
 
     act(() => {
-      jest.advanceTimersByTime(400);
+      jest.advanceTimersByTime(300);
     });
-    // 4 additional ticks at 100ms each
+    expect(onTick).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      jest.advanceTimersByTime(100); // crosses the 350ms threshold
+    });
+    // long-press fired → interval starts and emits its first tick
+    expect(onTick).toHaveBeenCalledTimes(2);
+
+    act(() => {
+      jest.advanceTimersByTime(300); // 3 more interval ticks
+    });
     expect(onTick).toHaveBeenCalledTimes(5);
   });
 
-  it('onPressOut cancels the interval', () => {
+  it('onPressOut before the long-press delay only leaves the single press-in tick', () => {
     const onTick = jest.fn();
-    const {result} = renderHook(() =>
-      useIncrementAction({onTick, intervalMs: 100}),
-    );
+    const {result} = renderHook(() => useIncrementAction({onTick, ...HOOK_OPTS}));
     act(() => {
       result.current.onPressIn();
-    });
-    act(() => {
       jest.advanceTimersByTime(150);
-    });
-    act(() => {
       result.current.onPressOut();
+      jest.advanceTimersByTime(1000);
+    });
+    expect(onTick).toHaveBeenCalledTimes(1);
+  });
+
+  it('onPressOut after the long-press delay cancels the rapid-fire interval', () => {
+    const onTick = jest.fn();
+    const {result} = renderHook(() => useIncrementAction({onTick, ...HOOK_OPTS}));
+    act(() => {
+      result.current.onPressIn();
+      jest.advanceTimersByTime(550); // press-in + long-press + 2 interval ticks
     });
     const callsAtRelease = onTick.mock.calls.length;
+    expect(callsAtRelease).toBeGreaterThanOrEqual(3);
     act(() => {
-      jest.advanceTimersByTime(500);
+      result.current.onPressOut();
+      jest.advanceTimersByTime(1000);
     });
     expect(onTick).toHaveBeenCalledTimes(callsAtRelease);
   });
 
-  it('a fresh onPressIn cancels the previous interval and starts a new one', () => {
+  it('a fresh onPressIn cancels the previous timers and restarts the long-press cycle', () => {
     const onTick = jest.fn();
-    const {result} = renderHook(() =>
-      useIncrementAction({onTick, intervalMs: 100}),
-    );
+    const {result} = renderHook(() => useIncrementAction({onTick, ...HOOK_OPTS}));
     act(() => {
       result.current.onPressIn();
       jest.advanceTimersByTime(150);
       result.current.onPressIn();
     });
-    // 1 (first press-in) + 1 (first interval tick) + 1 (second press-in immediate) = 3
-    expect(onTick).toHaveBeenCalledTimes(3);
+    // 1 (first press-in) + 1 (second press-in) — no long-press has triggered
+    expect(onTick).toHaveBeenCalledTimes(2);
 
     act(() => {
-      jest.advanceTimersByTime(200);
+      jest.advanceTimersByTime(450); // 350ms delay (one threshold tick) + 100ms (one interval tick)
     });
-    // 2 more ticks after the second press-in
-    expect(onTick).toHaveBeenCalledTimes(5);
+    expect(onTick).toHaveBeenCalledTimes(4);
   });
 
-  it('unmount clears any pending interval', () => {
+  it('unmount clears any pending timers', () => {
     const onTick = jest.fn();
-    const {result, unmount} = renderHook(() =>
-      useIncrementAction({onTick, intervalMs: 100}),
-    );
+    const {result, unmount} = renderHook(() => useIncrementAction({onTick, ...HOOK_OPTS}));
     act(() => {
       result.current.onPressIn();
     });

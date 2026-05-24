@@ -15,7 +15,7 @@ function TestApp(): React.JSX.Element {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Game"
+        initialRouteName="LayoutSelector"
         screenOptions={{headerShown: false}}>
         <Stack.Screen name="LayoutSelector" component={LayoutSelectorScreen} />
         <Stack.Screen
@@ -63,10 +63,16 @@ function fireHardwareBack(): boolean {
   return false;
 }
 
+async function enterGame(findByTestId: (id: string) => Promise<any>): Promise<void> {
+  const startBtn = await findByTestId('start-game');
+  fireEvent.press(startBtn);
+  await findByTestId('screen-game');
+}
+
 describe('GameScreen hardware back', () => {
   it('opens a confirmation modal on hardware back, intercepting navigation', async () => {
     const {findByTestId, queryByTestId} = render(<TestApp />);
-    await findByTestId('screen-game');
+    await enterGame(findByTestId);
     expect(queryByTestId('app-modal-backdrop')).toBeNull();
 
     expect(backHandlers.length).toBeGreaterThan(0);
@@ -89,7 +95,7 @@ describe('GameScreen hardware back', () => {
 
     try {
       const {findByTestId, queryByTestId} = render(<TestApp />);
-      await findByTestId('screen-game');
+      await enterGame(findByTestId);
 
       act(() => {
         fireHardwareBack();

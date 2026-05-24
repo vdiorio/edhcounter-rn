@@ -16,6 +16,11 @@ export function RootNavigator(): React.JSX.Element {
       <Stack.Screen
         name="Game"
         component={GameScreen}
+        options={{
+          statusBarHidden: true,
+          statusBarTranslucent: true,
+          navigationBarHidden: true,
+        }}
         initialParams={{numPlayers: 4}}
       />
       <Stack.Screen

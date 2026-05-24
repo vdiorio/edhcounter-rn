@@ -4,9 +4,9 @@
  * table (toward the human sitting on that edge).
  *
  *  - bottom edge → 0 (no rotation)
- *  - right edge  → 90 (clockwise quarter turn)
+ *  - right edge  → -90 (counter-clockwise quarter turn)
  *  - top edge    → 180 (upside down)
- *  - left edge   → -90 (counter-clockwise quarter turn)
+ *  - left edge   → 90 (clockwise quarter turn)
  */
 export type Direction = 0 | 90 | 180 | -90;
 
