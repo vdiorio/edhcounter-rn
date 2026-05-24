@@ -3,6 +3,11 @@ import {persist} from 'zustand/middleware';
 import {createCdmgSlice, type CdmgSlice} from '@/features/commander-damage';
 import {createCountersSlice, type CountersSlice} from '@/features/counters';
 import {
+  createMonarchInitiativeSlice,
+  MONARCH_INITIATIVE_INITIAL_STATE,
+  type MonarchInitiativeSlice,
+} from '@/features/monarch-initiative';
+import {
   clearProliferateUndoStack,
   createProliferateSlice,
   type ProliferateSlice,
@@ -27,6 +32,7 @@ export type GameStore =
   & LifeSlice
   & CdmgSlice
   & CountersSlice
+  & MonarchInitiativeSlice
   & ProliferateSlice
   & DamageAllSlice;
 
@@ -39,17 +45,24 @@ export const useGameStore = create<GameStore>()(
         ...createLifeSlice(set, get, store),
         ...createCdmgSlice(set, get, store),
         ...createCountersSlice(set, get, store),
+        ...createMonarchInitiativeSlice(set, get, store),
         ...createProliferateSlice(set, get, store),
         ...createDamageAllSlice(set, get, store),
         setNumPlayers: input => {
           core.setNumPlayers(input);
           clearProliferateUndoStack();
-          set({proliferateUndoCountByPlayer: {}});
+          set({
+            ...MONARCH_INITIATIVE_INITIAL_STATE,
+            proliferateUndoCountByPlayer: {},
+          });
         },
         resetGame: () => {
           core.resetGame();
           clearProliferateUndoStack();
-          set({proliferateUndoCountByPlayer: {}});
+          set({
+            ...MONARCH_INITIATIVE_INITIAL_STATE,
+            proliferateUndoCountByPlayer: {},
+          });
         },
       };
     },
