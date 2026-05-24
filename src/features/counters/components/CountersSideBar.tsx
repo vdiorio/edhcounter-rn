@@ -2,6 +2,7 @@ import React from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
 import {Typography} from '@/shared/ui';
 import {useIncrementAction} from '@/features/increment-buttons';
+import {ProliferateButton} from '@/features/proliferate';
 import {BORDER_COLOR} from '@/shared/constants/ui';
 import {useGameStore} from '@/store/gameStore';
 
@@ -86,7 +87,7 @@ export function CountersSideBar({playerId}: Props): React.JSX.Element {
         onIncrement={delta => incrementExperience({playerId, value: delta})}
       />
       <View testID={`counters-sidebar-${playerId}-proliferate-slot`} style={styles.proliferateRow}>
-        <Typography variant="label">Proliferate</Typography>
+        <ProliferateButton playerId={playerId} />
       </View>
     </View>
   );

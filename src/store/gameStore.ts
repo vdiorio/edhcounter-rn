@@ -2,6 +2,11 @@ import {create} from 'zustand';
 import {persist} from 'zustand/middleware';
 import {createCdmgSlice, type CdmgSlice} from '@/features/commander-damage';
 import {createCountersSlice, type CountersSlice} from '@/features/counters';
+import {
+  clearProliferateUndoStack,
+  createProliferateSlice,
+  type ProliferateSlice,
+} from '@/features/proliferate';
 import {createCoreSlice, type CoreSlice} from './coreSlice';
 import {createDamageAllSlice, type DamageAllSlice} from '@/features/damage-all';
 import {createLifeSlice, type LifeSlice} from '@/features/life-total/slice';
@@ -17,17 +22,37 @@ import {persistConfig} from '@/features/persistence/middleware';
  *  3. Update partializeGameState (in features/persistence/middleware.ts) to
  *     allow-list any new fields that should round-trip across restarts.
  */
-export type GameStore = CoreSlice & LifeSlice & CdmgSlice & CountersSlice & DamageAllSlice;
+export type GameStore =
+  & CoreSlice
+  & LifeSlice
+  & CdmgSlice
+  & CountersSlice
+  & ProliferateSlice
+  & DamageAllSlice;
 
 export const useGameStore = create<GameStore>()(
   persist(
-    (set, get, store) => ({
-      ...createCoreSlice(set, get, store),
-      ...createLifeSlice(set, get, store),
-      ...createCdmgSlice(set, get, store),
-      ...createCountersSlice(set, get, store),
-      ...createDamageAllSlice(set, get, store),
-    }),
+    (set, get, store) => {
+      const core = createCoreSlice(set, get, store);
+      return {
+        ...core,
+        ...createLifeSlice(set, get, store),
+        ...createCdmgSlice(set, get, store),
+        ...createCountersSlice(set, get, store),
+        ...createProliferateSlice(set, get, store),
+        ...createDamageAllSlice(set, get, store),
+        setNumPlayers: input => {
+          core.setNumPlayers(input);
+          clearProliferateUndoStack();
+          set({proliferateUndoCountByPlayer: {}});
+        },
+        resetGame: () => {
+          core.resetGame();
+          clearProliferateUndoStack();
+          set({proliferateUndoCountByPlayer: {}});
+        },
+      };
+    },
     persistConfig,
   ),
 );
