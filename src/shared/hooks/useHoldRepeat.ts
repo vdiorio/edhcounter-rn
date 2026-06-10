@@ -31,13 +31,8 @@ export type HoldRepeatHandlers = {
  * cleared on release and on unmount.
  */
 export function useHoldRepeat(config: HoldRepeatConfig): HoldRepeatHandlers {
-  const {
-    intervalMs,
-    delayMs = LONG_PRESS_DELAY,
-    tickOnHoldStart = false,
-  } = config;
-
-  // Latest callbacks via ref so handler identity stays stable across renders.
+  // Whole config (callbacks AND timing/flags) read via ref so handler identity
+  // stays stable across renders and timers always see the latest values.
   const configRef = useRef(config);
   configRef.current = config;
 
@@ -59,6 +54,11 @@ export function useHoldRepeat(config: HoldRepeatConfig): HoldRepeatHandlers {
   const onPressIn = useCallback(() => {
     clearTimers();
     heldRef.current = false;
+    const {
+      delayMs = LONG_PRESS_DELAY,
+      intervalMs,
+      tickOnHoldStart = false,
+    } = configRef.current;
     timeoutRef.current = setTimeout(() => {
       heldRef.current = true;
       configRef.current.onHoldStart?.();
@@ -67,7 +67,7 @@ export function useHoldRepeat(config: HoldRepeatConfig): HoldRepeatHandlers {
         configRef.current.onHoldTick();
       }, intervalMs);
     }, delayMs);
-  }, [clearTimers, delayMs, intervalMs, tickOnHoldStart]);
+  }, [clearTimers]);
 
   const onPressOut = useCallback(() => {
     clearTimers();

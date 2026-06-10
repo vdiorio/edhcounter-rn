@@ -1,5 +1,10 @@
 import React, {useMemo} from 'react';
-import {FlatList, StyleSheet, View, type ListRenderItemInfo} from 'react-native';
+import {
+  FlatList,
+  StyleSheet,
+  View,
+  type ListRenderItemInfo,
+} from 'react-native';
 import {useTranslation} from 'react-i18next';
 import {useGameStore} from '@/store/gameStore';
 import {Typography} from '@/shared/ui';
@@ -73,12 +78,11 @@ export function HistorySideBar({playerId}: Props): React.JSX.Element {
         {t('history')}
       </Typography>
       <FlatList
-        inverted
         style={styles.list}
         data={rows}
         keyExtractor={keyExtractor}
         renderItem={renderHistoryRow}
-        ListFooterComponent={
+        ListHeaderComponent={
           <View style={styles.row}>
             <Typography
               testID="history-baseline"

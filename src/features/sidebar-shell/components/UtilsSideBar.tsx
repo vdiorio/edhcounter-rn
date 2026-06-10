@@ -45,6 +45,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF0a',
     borderLeftWidth: 0.5,
     borderColor: BORDER_COLOR,
+    // Above the PlayerBox counters-trigger overlay (zIndex 11) so the sidebar's
+    // own buttons (e.g. cdmg) receive their taps; below the open slot (21).
+    zIndex: 12,
   },
   damageAll: {
     marginTop: 'auto',

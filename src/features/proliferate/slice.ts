@@ -17,9 +17,12 @@ export type ProliferateSlice = {
  * (store/gameReset.ts) merges this with other slices' reset partials; the
  * module-level undo stack is cleared separately via clearProliferateUndoStack.
  */
-export const PROLIFERATE_RESET_STATE = {
+export const PROLIFERATE_RESET_STATE: Pick<
+  ProliferateSlice,
+  'proliferateUndoCountByPlayer'
+> = {
   proliferateUndoCountByPlayer: {},
-} as const;
+};
 
 export const createProliferateSlice: StateCreator<
   GameStore,

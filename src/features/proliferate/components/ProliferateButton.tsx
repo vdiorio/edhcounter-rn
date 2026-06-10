@@ -15,13 +15,18 @@ export function ProliferateButton({playerId}: Props): React.JSX.Element {
     const caller = s.players[playerId];
     if (!caller) return false;
     if (caller.energy > 0 || caller.experience > 0) return true;
-    return Object.entries(s.players).some(([id, p]) => Number(id) !== playerId && p.poison > 0);
+    return Object.entries(s.players).some(
+      ([id, p]) => Number(id) !== playerId && p.poison > 0,
+    );
   });
   const disabled = !canProliferate && undoCount === 0;
 
   return (
     <Pressable
       testID={`proliferate-${playerId}`}
+      accessibilityRole="button"
+      accessibilityLabel="Proliferate"
+      accessibilityState={{disabled}}
       disabled={disabled}
       onPress={onTap}
       onPressIn={onPressIn}
@@ -30,15 +35,14 @@ export function ProliferateButton({playerId}: Props): React.JSX.Element {
       <MaterialCommunityIcons
         testID={`proliferate-${playerId}-icon`}
         name="mushroom-outline"
-        size={18}
+        size={22}
         color="#9C27B0"
       />
-      <Typography variant="label" style={styles.label}>
-        Proliferate
-      </Typography>
       {undoCount > 0 ? (
         <View testID={`proliferate-${playerId}-badge`} style={styles.badge}>
-          <Typography testID={`proliferate-${playerId}-badge-value`} style={styles.badgeValue}>
+          <Typography
+            testID={`proliferate-${playerId}-badge-value`}
+            style={styles.badgeValue}>
             {undoCount}
           </Typography>
         </View>
@@ -49,23 +53,18 @@ export function ProliferateButton({playerId}: Props): React.JSX.Element {
 
 const styles = StyleSheet.create({
   root: {
-    minHeight: 40,
-    minWidth: 120,
+    minHeight: 36,
     borderWidth: 1,
     borderColor: '#6A1B9A',
-    borderRadius: 10,
+    borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    flexDirection: 'row',
-    gap: 6,
     paddingHorizontal: 10,
+    paddingVertical: 4,
     position: 'relative',
   },
   disabled: {
     opacity: 0.45,
-  },
-  label: {
-    fontSize: 12,
   },
   badge: {
     position: 'absolute',

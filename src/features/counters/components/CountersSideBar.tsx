@@ -1,8 +1,9 @@
 import React from 'react';
 import {Pressable, StyleSheet, View} from 'react-native';
-import {Typography} from '@/shared/ui';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useIncrementAction} from '@/features/increment-buttons';
 import {ProliferateButton} from '@/features/proliferate';
+import {Typography} from '@/shared/ui';
 import {BORDER_COLOR} from '@/shared/constants/ui';
 import {useGameStore} from '@/store/gameStore';
 
@@ -14,12 +15,19 @@ type CounterRowProps = {
   playerId: number;
   counterKey: 'poison' | 'energy' | 'experience';
   color: string;
-  label: string;
+  icon: string;
   value: number;
   onIncrement: (delta: number) => void;
 };
 
-function CounterRow({playerId, counterKey, color, label, value, onIncrement}: CounterRowProps): React.JSX.Element {
+function CounterRow({
+  playerId,
+  counterKey,
+  color,
+  icon,
+  value,
+  onIncrement,
+}: CounterRowProps): React.JSX.Element {
   const addAction = useIncrementAction({onTick: () => onIncrement(1)});
   const subAction = useIncrementAction({onTick: () => onIncrement(-1)});
 
@@ -27,25 +35,31 @@ function CounterRow({playerId, counterKey, color, label, value, onIncrement}: Co
     <View style={styles.row}>
       <View style={[styles.colorRail, {backgroundColor: color}]} />
       <View style={styles.rowBody}>
-        <Typography style={styles.label}>{label}</Typography>
+        <Ionicons name={icon} size={16} color={color} style={styles.icon} />
         <Pressable
           testID={`counters-sidebar-${playerId}-${counterKey}-minus`}
+          accessibilityRole="button"
+          accessibilityLabel={`Decrease ${counterKey}`}
           onPress={subAction.onPress}
           onPressIn={subAction.onPressIn}
           onPressOut={subAction.onPressOut}
           style={styles.button}>
-          <Typography variant="title">-</Typography>
+          <Ionicons name="remove" size={20} color={color} />
         </Pressable>
-        <Typography testID={`counters-sidebar-${playerId}-${counterKey}-value`} style={styles.value}>
+        <Typography
+          testID={`counters-sidebar-${playerId}-${counterKey}-value`}
+          style={styles.value}>
           {value}
         </Typography>
         <Pressable
           testID={`counters-sidebar-${playerId}-${counterKey}-plus`}
+          accessibilityRole="button"
+          accessibilityLabel={`Increase ${counterKey}`}
           onPress={addAction.onPress}
           onPressIn={addAction.onPressIn}
           onPressOut={addAction.onPressOut}
           style={styles.button}>
-          <Typography variant="title">+</Typography>
+          <Ionicons name="add" size={20} color={color} />
         </Pressable>
       </View>
     </View>
@@ -65,7 +79,7 @@ export function CountersSideBar({playerId}: Props): React.JSX.Element {
       <CounterRow
         playerId={playerId}
         counterKey="poison"
-        label="Poison"
+        icon="skull-outline"
         color="#2e7d32"
         value={poison}
         onIncrement={delta => incrementPoison({playerId, value: delta})}
@@ -73,7 +87,7 @@ export function CountersSideBar({playerId}: Props): React.JSX.Element {
       <CounterRow
         playerId={playerId}
         counterKey="energy"
-        label="Energy"
+        icon="flash"
         color="#fbc02d"
         value={energy}
         onIncrement={delta => incrementEnergy({playerId, value: delta})}
@@ -81,12 +95,14 @@ export function CountersSideBar({playerId}: Props): React.JSX.Element {
       <CounterRow
         playerId={playerId}
         counterKey="experience"
-        label="Experience"
+        icon="school"
         color="#1e88e5"
         value={experience}
         onIncrement={delta => incrementExperience({playerId, value: delta})}
       />
-      <View testID={`counters-sidebar-${playerId}-proliferate-slot`} style={styles.proliferateRow}>
+      <View
+        testID={`counters-sidebar-${playerId}-proliferate-slot`}
+        style={styles.proliferateRow}>
         <ProliferateButton playerId={playerId} />
       </View>
     </View>
@@ -102,35 +118,38 @@ const styles = StyleSheet.create({
   },
   row: {
     flex: 1,
-    minHeight: 48,
+    minHeight: 40,
     flexDirection: 'row',
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderColor: BORDER_COLOR,
   },
   colorRail: {
-    width: 6,
+    width: 5,
   },
+  // Icon (left) + symmetric flexible -/value/+ controls; everything flexes so it
+  // stays compact as the panel narrows on higher player counts.
   rowBody: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 8,
+    paddingHorizontal: 2,
   },
-  label: {
-    flex: 1,
-  },
-  value: {
-    width: 32,
-    textAlign: 'center',
+  icon: {
+    marginRight: 1,
   },
   button: {
-    width: 36,
+    flex: 1,
+    minHeight: 28,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  value: {
+    minWidth: 16,
+    textAlign: 'center',
+  },
   proliferateRow: {
     flex: 1,
-    minHeight: 48,
+    minHeight: 40,
     alignItems: 'center',
     justifyContent: 'center',
   },

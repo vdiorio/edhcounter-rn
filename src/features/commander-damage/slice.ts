@@ -29,10 +29,10 @@ export const createCdmgSlice: StateCreator<GameStore, [], [], CdmgSlice> = (
 
     const slotIndex = partner ? 1 : 0;
     const prevTuple = target.Cdmg[attackerId] ?? [0, 0];
-    const nextTuple: CommanderDamageEntry = [
-      ...prevTuple,
-    ] as CommanderDamageEntry;
-    nextTuple[slotIndex] = clampCdmg(prevTuple[slotIndex] + value);
+    const [prevPrimary, prevPartner] = prevTuple;
+    const nextTuple: CommanderDamageEntry = partner
+      ? [prevPrimary, clampCdmg(prevPartner + value)]
+      : [clampCdmg(prevPrimary + value), prevPartner];
     const appliedDelta = nextTuple[slotIndex] - prevTuple[slotIndex];
 
     set(state => ({

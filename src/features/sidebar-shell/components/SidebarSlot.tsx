@@ -12,17 +12,26 @@ type Props = {
 const SLIDE_IN_MS = 180;
 const SLIDE_OUT_MS = 50;
 // Defensive: the Jest reanimated mock does not provide layout-animation builders.
-const ENTERING = SlideInLeft?.duration ? SlideInLeft.duration(SLIDE_IN_MS) : undefined;
-const EXITING = SlideOutLeft?.duration ? SlideOutLeft.duration(SLIDE_OUT_MS) : undefined;
+const ENTERING = SlideInLeft?.duration
+  ? SlideInLeft.duration(SLIDE_IN_MS)
+  : undefined;
+const EXITING = SlideOutLeft?.duration
+  ? SlideOutLeft.duration(SLIDE_OUT_MS)
+  : undefined;
 
-export function SidebarSlot({playerId, selectedBar}: Props): React.JSX.Element | null {
+export function SidebarSlot({
+  playerId,
+  selectedBar,
+}: Props): React.JSX.Element | null {
   const sidebar = getSidebar(selectedBar);
   if (!sidebar) {
     return null;
   }
 
   return (
-    <View testID={`sidebar-slot-${playerId}`} style={[styles.wrapper, {width: sidebar.width}]}>
+    <View
+      testID={`sidebar-slot-${playerId}`}
+      style={[styles.wrapper, {width: sidebar.width}]}>
       <Animated.View
         key={sidebar.key}
         style={styles.bar}
