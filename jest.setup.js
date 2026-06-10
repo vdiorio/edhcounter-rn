@@ -1,3 +1,4 @@
+/* eslint-env jest */
 // Reanimated mock — Reanimated 4 ships its mock as TS only, so we cannot
 // require('react-native-reanimated/mock') from Jest without ts-node. Provide
 // a manual mock that swaps Animated.<Text|View|...> for plain RN components

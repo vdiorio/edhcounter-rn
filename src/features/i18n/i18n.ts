@@ -27,7 +27,9 @@ export function initI18n(): Promise<void> {
 
 usePreferencesStore.subscribe(state => {
   if (i18n.isInitialized && i18n.language !== state.language) {
-    void i18n.changeLanguage(state.language);
+    i18n.changeLanguage(state.language).catch(() => {
+      // Language switch is best-effort; ignore rejection.
+    });
   }
 });
 

@@ -44,8 +44,6 @@ export function Lifetotal({playerId, fontSize = LIFE_FONT_SIZE}: Props): React.J
             fontSize,
             opacity,
             textShadowColor: `${playerColor}BB`,
-            textShadowRadius: 1,
-            textShadowOffset: {width: 2, height: 2},
           },
         ]}>
         {lTotal}
@@ -64,6 +62,8 @@ const styles = StyleSheet.create({
   lifeTotal: {
     fontWeight: 'bold',
     margin: 10,
+    textShadowRadius: 1,
+    textShadowOffset: {width: 2, height: 2},
   },
   delta: {
     position: 'absolute',

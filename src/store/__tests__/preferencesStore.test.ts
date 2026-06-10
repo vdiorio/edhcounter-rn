@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import {PREFERENCES_STORAGE_KEY} from '@/features/i18n/constants';
 
 type Locale = {languageCode: 'en' | 'pt'};

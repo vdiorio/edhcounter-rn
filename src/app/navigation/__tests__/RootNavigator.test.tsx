@@ -15,13 +15,13 @@ const mockNavigatorProps = jest.fn();
 const mockScreenCalls: ScreenCall[] = [];
 
 jest.mock('@react-navigation/native-stack', () => {
-  const React = require('react');
+  const ReactMock = require('react');
 
   return {
     createNativeStackNavigator: () => ({
       Navigator: ({children, ...props}: React.PropsWithChildren<Record<string, unknown>>) => {
         mockNavigatorProps(props);
-        return React.createElement(React.Fragment, null, children);
+        return ReactMock.createElement(ReactMock.Fragment, null, children);
       },
       Screen: ({name, options}: ScreenCall) => {
         mockScreenCalls.push({name, options});

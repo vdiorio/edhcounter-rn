@@ -17,8 +17,9 @@ export type PersistedGameState = {
 };
 
 function stripDelta(player: Player): PersistedPlayer {
-  const {delta: _delta, ...rest} = player;
-  return rest;
+  const copy: Partial<Player> = {...player};
+  delete copy.delta;
+  return copy as PersistedPlayer;
 }
 
 export function partializeGameState(state: GameStore): PersistedGameState {

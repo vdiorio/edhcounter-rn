@@ -8,7 +8,9 @@ jest.setTimeout(20000);
 
 async function freshStore() {
   jest.resetModules();
-  const {default: AsyncStorage} = require('@react-native-async-storage/async-storage');
+  const {
+    default: AsyncStorage,
+  } = require('@react-native-async-storage/async-storage');
   await AsyncStorage.clear();
   return {
     AsyncStorage,
@@ -18,7 +20,9 @@ async function freshStore() {
 
 async function freshStoreWithSeed(seed: Record<string, string>) {
   jest.resetModules();
-  const {default: AsyncStorage} = require('@react-native-async-storage/async-storage');
+  const {
+    default: AsyncStorage,
+  } = require('@react-native-async-storage/async-storage');
   await AsyncStorage.clear();
   for (const [k, v] of Object.entries(seed)) {
     await AsyncStorage.setItem(k, v);
@@ -30,7 +34,10 @@ async function freshStoreWithSeed(seed: Record<string, string>) {
 }
 
 async function waitForHydration(store: {
-  persist: {hasHydrated: () => boolean; onFinishHydration: (fn: () => void) => () => void};
+  persist: {
+    hasHydrated: () => boolean;
+    onFinishHydration: (fn: () => void) => () => void;
+  };
 }) {
   if (store.persist.hasHydrated()) return;
   await new Promise<void>(resolve => {
@@ -45,7 +52,10 @@ async function flushWrites() {
   await new Promise<void>(r => setTimeout(() => r(), 0));
 }
 
-function readPersisted(raw: string | null): {version: number; state: PersistedGameState} {
+function readPersisted(raw: string | null): {
+  version: number;
+  state: PersistedGameState;
+} {
   if (!raw) throw new Error('no persisted blob');
   return JSON.parse(raw);
 }
@@ -136,8 +146,26 @@ describe('persist middleware — hydrate side', () => {
           alt: false,
           gameLayout: [1, 0, 0, 1],
           players: {
-            0: {id: 0, lTotal: 37, history: [-3], Cdmg: {}, chain: false, poison: 0, energy: 0, experience: 0},
-            1: {id: 1, lTotal: 40, history: [], Cdmg: {}, chain: false, poison: 0, energy: 0, experience: 0},
+            0: {
+              id: 0,
+              lTotal: 37,
+              history: [-3],
+              Cdmg: {},
+              chain: false,
+              poison: 0,
+              energy: 0,
+              experience: 0,
+            },
+            1: {
+              id: 1,
+              lTotal: 40,
+              history: [],
+              Cdmg: {},
+              chain: false,
+              poison: 0,
+              energy: 0,
+              experience: 0,
+            },
           },
         },
       }),
@@ -158,8 +186,26 @@ describe('persist middleware — hydrate side', () => {
           alt: false,
           gameLayout: [1, 0, 0, 1],
           players: {
-            0: {id: 0, lTotal: 37, history: [-3], Cdmg: {}, chain: false, poison: 0, energy: 0, experience: 0},
-            1: {id: 1, lTotal: 40, history: [], Cdmg: {}, chain: false, poison: 0, energy: 0, experience: 0},
+            0: {
+              id: 0,
+              lTotal: 37,
+              history: [-3],
+              Cdmg: {},
+              chain: false,
+              poison: 0,
+              energy: 0,
+              experience: 0,
+            },
+            1: {
+              id: 1,
+              lTotal: 40,
+              history: [],
+              Cdmg: {},
+              chain: false,
+              poison: 0,
+              energy: 0,
+              experience: 0,
+            },
           },
         },
       }),
