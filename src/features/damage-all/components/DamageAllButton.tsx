@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {Pressable, StyleSheet, Text, View} from 'react-native';
 import Svg, {Polygon} from 'react-native-svg';
 import Animated, {
@@ -12,7 +12,7 @@ import Animated, {
 import {useAppColors} from '@/features/theming';
 import {useGameStore} from '@/store/gameStore';
 import {DAMAGE_ALL_INTERVAL} from '@/store/constants/game';
-import {LONG_PRESS_DELAY} from '@/shared/constants/ui';
+import {useHoldRepeat} from '@/shared/hooks/useHoldRepeat';
 
 const TAP_ROTATION = 45;
 const TAP_DURATION = 120;
@@ -49,75 +49,64 @@ export function DamageAllButton({playerId}: Props): React.JSX.Element {
   const damageAllOpponents = useGameStore(s => s.damageAllOpponents);
   const rotation = useSharedValue(0);
   const [healMode, setHealMode] = useState(false);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const longPressTriggeredRef = useRef(false);
-
-  const clearTimers = useCallback(() => {
-    if (timeoutRef.current !== null) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    if (intervalRef.current !== null) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{rotate: `${rotation.value}deg`}],
   }));
 
-  const startHoldMode = useCallback(() => {
-    longPressTriggeredRef.current = true;
-    setHealMode(true);
-    rotation.value = withRepeat(
-      withTiming(HOLD_ROTATION, {duration: HOLD_DURATION, easing: Easing.linear}),
-      -1,
-      false,
-    );
-    // Hold intentionally flips from damage to heal so one button exposes both modes.
-    damageAllOpponents({playerId, value: 1});
-    intervalRef.current = setInterval(() => {
-      damageAllOpponents({playerId, value: 1});
-    }, DAMAGE_ALL_INTERVAL);
-  }, [damageAllOpponents, playerId, rotation]);
+  // Tap damages all opponents; holding flips to heal mode and repeats +1, so
+  // one button exposes both modes. Timer bookkeeping lives in useHoldRepeat.
+  const {
+    onTap,
+    onPressIn: holdPressIn,
+    onPressOut: holdPressOut,
+  } = useHoldRepeat({
+    onTap: () => damageAllOpponents({playerId, value: -1}),
+    onHoldStart: () => {
+      setHealMode(true);
+      rotation.value = withRepeat(
+        withTiming(HOLD_ROTATION, {
+          duration: HOLD_DURATION,
+          easing: Easing.linear,
+        }),
+        -1,
+        false,
+      );
+    },
+    onHoldTick: () => damageAllOpponents({playerId, value: 1}),
+    intervalMs: DAMAGE_ALL_INTERVAL,
+    tickOnHoldStart: true,
+  });
 
   const onPressIn = useCallback(() => {
-    clearTimers();
-    rotation.value = withTiming(TAP_ROTATION, {duration: TAP_DURATION, easing: Easing.ease});
-    timeoutRef.current = setTimeout(startHoldMode, LONG_PRESS_DELAY);
-  }, [clearTimers, rotation, startHoldMode]);
+    rotation.value = withTiming(TAP_ROTATION, {
+      duration: TAP_DURATION,
+      easing: Easing.ease,
+    });
+    holdPressIn();
+  }, [holdPressIn, rotation]);
 
   const onPressOut = useCallback(() => {
-    clearTimers();
     setHealMode(false);
     cancelAnimation(rotation);
-    rotation.value = withTiming(0, {duration: TAP_DURATION, easing: Easing.ease});
-  }, [clearTimers, rotation]);
-
-  const onPress = useCallback(() => {
-    clearTimers();
-
-    if (longPressTriggeredRef.current) {
-      longPressTriggeredRef.current = false;
-      return;
-    }
-
-    damageAllOpponents({playerId, value: -1});
-  }, [clearTimers, damageAllOpponents, playerId]);
-
-  useEffect(() => () => clearTimers(), [clearTimers]);
+    rotation.value = withTiming(0, {
+      duration: TAP_DURATION,
+      easing: Easing.ease,
+    });
+    holdPressOut();
+  }, [holdPressOut, rotation]);
 
   return (
     <Pressable
       testID={`damage-all-${playerId}`}
-      onPress={onPress}
+      onPress={onTap}
       onPressIn={onPressIn}
       onPressOut={onPressOut}
       style={({pressed}) => [styles.button, pressed && styles.buttonPressed]}>
       <View style={styles.frame}>
-        <Animated.View testID={`damage-all-${playerId}-outline-wrap`} style={animatedStyle}>
+        <Animated.View
+          testID={`damage-all-${playerId}-outline-wrap`}
+          style={animatedStyle}>
           <Svg
             testID={`damage-all-${playerId}-outline`}
             width={BUTTON_SIZE}

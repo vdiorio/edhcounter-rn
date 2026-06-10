@@ -27,7 +27,10 @@ function popRecord(playerId: number): ProliferateRecord | undefined {
   return record;
 }
 
-function applyDelta(players: GameStore['players'], delta: CounterDelta): GameStore['players'] {
+function applyDelta(
+  players: GameStore['players'],
+  delta: CounterDelta,
+): GameStore['players'] {
   const current = players[delta.playerId];
   if (!current) return players;
   return {
@@ -47,7 +50,10 @@ export function clearProliferateUndoStack(): void {
   undoStackByPlayer.clear();
 }
 
-export function proliferateAction(state: GameStore, playerId: number): Partial<GameStore> {
+export function proliferateAction(
+  state: GameStore,
+  playerId: number,
+): Partial<GameStore> {
   const caller = state.players[playerId];
   if (!caller) return {players: state.players};
 
@@ -84,7 +90,6 @@ export function proliferateAction(state: GameStore, playerId: number): Partial<G
 export function undoProliferateAction(
   state: GameStore,
   playerId: number,
-  _occurrenceIndex: number,
 ): Partial<GameStore> {
   const record = popRecord(playerId);
   if (!record) return {players: state.players};

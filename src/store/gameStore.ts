@@ -4,11 +4,9 @@ import {createCdmgSlice, type CdmgSlice} from '@/features/commander-damage';
 import {createCountersSlice, type CountersSlice} from '@/features/counters';
 import {
   createMonarchInitiativeSlice,
-  MONARCH_INITIATIVE_INITIAL_STATE,
   type MonarchInitiativeSlice,
 } from '@/features/monarch-initiative';
 import {
-  clearProliferateUndoStack,
   createProliferateSlice,
   type ProliferateSlice,
 } from '@/features/proliferate';
@@ -16,6 +14,7 @@ import {createCoreSlice, type CoreSlice} from './coreSlice';
 import {createDamageAllSlice, type DamageAllSlice} from '@/features/damage-all';
 import {createLifeSlice, type LifeSlice} from '@/features/life-total/slice';
 import {persistConfig} from '@/features/persistence/middleware';
+import {buildGameResetState, runGameResetSideEffects} from './gameReset';
 
 /**
  * The composed game store. Spec 03 lays the foundation with CoreSlice;
@@ -26,46 +25,38 @@ import {persistConfig} from '@/features/persistence/middleware';
  *  2. Spread `createXSlice(set, get, store)` into the composer below.
  *  3. Update partializeGameState (in features/persistence/middleware.ts) to
  *     allow-list any new fields that should round-trip across restarts.
+ *  4. If the slice carries cross-cutting state that must clear on new game /
+ *     reset, register it in store/gameReset.ts (see the reset contract there).
  */
-export type GameStore =
-  & CoreSlice
-  & LifeSlice
-  & CdmgSlice
-  & CountersSlice
-  & MonarchInitiativeSlice
-  & ProliferateSlice
-  & DamageAllSlice;
+export type GameStore = CoreSlice &
+  LifeSlice &
+  CdmgSlice &
+  CountersSlice &
+  MonarchInitiativeSlice &
+  ProliferateSlice &
+  DamageAllSlice;
 
 export const useGameStore = create<GameStore>()(
-  persist(
-    (set, get, store) => {
-      const core = createCoreSlice(set, get, store);
-      return {
-        ...core,
-        ...createLifeSlice(set, get, store),
-        ...createCdmgSlice(set, get, store),
-        ...createCountersSlice(set, get, store),
-        ...createMonarchInitiativeSlice(set, get, store),
-        ...createProliferateSlice(set, get, store),
-        ...createDamageAllSlice(set, get, store),
-        setNumPlayers: input => {
-          core.setNumPlayers(input);
-          clearProliferateUndoStack();
-          set({
-            ...MONARCH_INITIATIVE_INITIAL_STATE,
-            proliferateUndoCountByPlayer: {},
-          });
-        },
-        resetGame: () => {
-          core.resetGame();
-          clearProliferateUndoStack();
-          set({
-            ...MONARCH_INITIATIVE_INITIAL_STATE,
-            proliferateUndoCountByPlayer: {},
-          });
-        },
-      };
-    },
-    persistConfig,
-  ),
+  persist((set, get, store) => {
+    const core = createCoreSlice(set, get, store);
+    return {
+      ...core,
+      ...createLifeSlice(set, get, store),
+      ...createCdmgSlice(set, get, store),
+      ...createCountersSlice(set, get, store),
+      ...createMonarchInitiativeSlice(set, get, store),
+      ...createProliferateSlice(set, get, store),
+      ...createDamageAllSlice(set, get, store),
+      setNumPlayers: input => {
+        core.setNumPlayers(input);
+        runGameResetSideEffects();
+        set(buildGameResetState());
+      },
+      resetGame: () => {
+        core.resetGame();
+        runGameResetSideEffects();
+        set(buildGameResetState());
+      },
+    };
+  }, persistConfig),
 );

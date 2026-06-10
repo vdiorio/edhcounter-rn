@@ -1,97 +1,74 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# EdhCounter
 
-# Getting Started
+A life and commander-damage counter for **Magic: The Gathering — Commander (EDH)** tabletop play. Built with bare React Native (no Expo) for a small binary and a self-owned native toolchain.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+EdhCounter tracks 2–6 players on a single rotated board so everyone reads their own total right-side up. It covers life totals with delta animation and history, commander damage (with an optional life-chain), poison / energy / experience counters, proliferate, monarch and initiative, "damage all opponents", a starting-player picker with confetti, light/dark theming, and a bilingual UI (English / Português).
 
-## Step 1: Start Metro
+## Stack
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+| Layer | Choice |
+|---|---|
+| Framework | React Native 0.85 (New Architecture) + React 19 |
+| Language | TypeScript (`strict`) |
+| Navigation | `@react-navigation/native` + native-stack |
+| State | Zustand 5 — feature-composed slices + `persist` middleware |
+| Persistence | `@react-native-async-storage/async-storage` |
+| Animation | `react-native-reanimated` |
+| Gestures | `react-native-gesture-handler` |
+| i18n | `i18next` + `react-i18next` + `react-native-localize` |
+| Icons / SVG / Gradients | `react-native-vector-icons`, `react-native-svg`, `react-native-linear-gradient` |
+| Tests | Jest + `@testing-library/react-native` |
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## Requirements
 
-```sh
-# Using npm
-npm start
+- **Node ≥ 22.11.0**
+- Android: JDK 17, Android SDK (see `android/`)
+- iOS: Xcode + CocoaPods (macOS only)
 
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+## Getting started
 
 ```sh
-bundle install
+npm install            # also runs patch-package (postinstall)
+npm start              # Metro bundler
+
+npm run android        # build + run on an Android device/emulator
+npm run ios            # build + run on an iOS simulator (macOS)
 ```
 
-Then, and every time you update your native dependencies, run:
+## Quality checks
 
 ```sh
-bundle exec pod install
+npm test               # Jest (single file: npx jest <path>)
+npm run lint           # ESLint
+npx tsc --noEmit       # type check
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+There is no `build` script — release builds go through Gradle (`android/`) and Xcode (`ios/`). CI (`.github/workflows/ci.yml`) runs typecheck + tests as blocking and lint as advisory.
 
-```sh
-# Using npm
-npm run ios
+## Architecture in one paragraph
 
-# OR using Yarn
-yarn ios
+Code is organized **by feature** under `src/features/<name>/`, each owning its components, hooks, Zustand slice, and tests, and exposing a single `index.ts` barrel — cross-feature imports go through barrels, never deep paths. A single `useGameStore` is composed from each feature's slice factory; cross-slice actions (proliferate, damageAll) are pure functions re-exposed on the store. Per-player UI is assembled by `features/player-box`. See **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** for the store composition, reset contract, persistence flow, and the design specs.
+
+## Project layout
+
+```
+src/
+├── app/            # App root + React Navigation (RootNavigator, route types)
+├── screens/        # Screen-level composition (GameScreen, CdmgScreen, …)
+├── features/<name> # Feature slices: components + hooks + slice + tests + index.ts
+├── store/          # gameStore (composed slices), preferencesStore, reset contract
+└── shared/         # Cross-feature primitives: ui/, animations/, hooks/, constants/
+docs/
+├── specs/          # Design specs (00 overview … 18). Source of intent.
+└── ARCHITECTURE.md # How the shipped code is wired together.
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## Documentation
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — runtime architecture, state model, conventions.
+- **[docs/specs/](docs/specs/)** — the original design specs (00 is the master overview).
+- Per-feature `README.md` files document each feature's public API where present.
 
-## Step 3: Modify your app
+## License
 
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+MIT.

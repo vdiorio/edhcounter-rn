@@ -23,6 +23,8 @@ import {ENTRY_FADE} from '@/shared/constants/ui';
 
 const CONFETTI_DELAY_MS = 230;
 const STARTING_BORDER_COLOR = '#ffffff';
+// Translucent white wash over the starting player's cell (~9% alpha).
+const STARTING_OVERLAY_COLOR = '#ffffff18';
 
 // Defensive: the Jest reanimated mock does not provide layout-animation builders.
 const ENTERING = FadeIn?.duration ? FadeIn.duration(ENTRY_FADE) : undefined;
@@ -114,7 +116,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: '#ffffff18',
+    backgroundColor: STARTING_OVERLAY_COLOR,
     borderRadius: 8,
     zIndex: 10,
   },

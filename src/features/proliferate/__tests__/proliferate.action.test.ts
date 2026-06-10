@@ -67,7 +67,7 @@ describe('proliferateAction', () => {
 
     state = {...state, ...proliferateAction(state, 0)};
     state = {...state, ...proliferateAction(state, 0)};
-    const undone = undoProliferateAction(state, 0, 0);
+    const undone = undoProliferateAction(state, 0);
 
     expect(undone.players![0]!.energy).toBe(2);
     expect(getProliferateUndoCount(0)).toBe(1);
@@ -88,14 +88,14 @@ describe('proliferateAction', () => {
         },
       },
     };
-    const undone = undoProliferateAction(state, 0, 0);
+    const undone = undoProliferateAction(state, 0);
 
     expect(undone.players![1]!.poison).toBe(6);
   });
 
   it('undo with empty stack is a no-op', () => {
     const state = useGameStore.getState();
-    const undone = undoProliferateAction(state, 0, 0);
+    const undone = undoProliferateAction(state, 0);
 
     expect(undone.players).toEqual(state.players);
   });
