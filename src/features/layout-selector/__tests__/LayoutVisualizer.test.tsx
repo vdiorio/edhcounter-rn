@@ -1,4 +1,5 @@
 import React from 'react';
+import {StyleSheet} from 'react-native';
 import {render} from '@testing-library/react-native';
 import {LayoutVisualizer} from '../components/LayoutVisualizer';
 import {useStyleStore} from '@/features/theming';
@@ -18,7 +19,7 @@ describe('LayoutVisualizer', () => {
     );
     for (let i = 0; i < 4; i++) {
       const cell = getByTestId(`visualizer-cell-${i}`);
-      expect(cell.props.style.backgroundColor).toBe(colors[i]);
+      expect(StyleSheet.flatten(cell.props.style).backgroundColor).toBe(colors[i]);
     }
   });
 
@@ -29,7 +30,9 @@ describe('LayoutVisualizer', () => {
     );
     for (let i = 0; i < 4; i++) {
       const cell = getByTestId(`visualizer-cell-${i}`);
-      expect(cell.props.style.backgroundColor).toBe(palette[i % palette.length]);
+      expect(StyleSheet.flatten(cell.props.style).backgroundColor).toBe(
+        palette[i % palette.length],
+      );
     }
   });
 
@@ -40,7 +43,7 @@ describe('LayoutVisualizer', () => {
       <LayoutVisualizer layout={[1, 1, 1, 1]} width={W} height={H} />,
     );
     for (const cell of getAllByTestId(/^visualizer-cell-/)) {
-      const {left, top, width, height} = cell.props.style;
+      const {left, top, width, height} = StyleSheet.flatten(cell.props.style);
       expect(left).toBeGreaterThanOrEqual(0);
       expect(top).toBeGreaterThanOrEqual(0);
       expect(left + width).toBeLessThanOrEqual(W + 0.01);

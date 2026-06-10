@@ -1,11 +1,7 @@
 export const LIFE_FONT_SIZE = 48;
 export const DELTA_FACTOR = 0.333;
-export const ICON_FACTOR = 0.25;
-export const STANDARD_DURATION = 300;
-export const INITIAL_DELAY = 700;
 export const ENTRY_FADE = 1000;
 export const DELTA_ANIMATION = 100;
-export const OPACITY_TRANSITION = 200;
 export const HOLD_INTERVAL = 100;
 export const LONG_PRESS_DELAY = 350;
 export const PLAYER_BOX_GAP = 3;

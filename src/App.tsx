@@ -8,6 +8,10 @@ import {NavigationContainer} from '@react-navigation/native';
 import {RootNavigator} from '@/app/navigation/RootNavigator';
 import {initI18n} from '@/features/i18n';
 
+function onNavReady(): void {
+  BootSplash.hide({fade: true});
+}
+
 export default function App(): React.JSX.Element {
   const [ready, setReady] = useState(false);
 
@@ -23,10 +27,6 @@ export default function App(): React.JSX.Element {
       cancelled = true;
     };
   }, []);
-
-  const onNavReady = (): void => {
-    BootSplash.hide({fade: true});
-  };
 
   if (!ready) {
     return (

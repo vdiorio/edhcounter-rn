@@ -14,9 +14,11 @@ export const createDamageAllSlice: StateCreator<GameStore, [], [], DamageAllSlic
     const players = get().players;
     if (!players[playerId]) return;
 
-    const opponentIds = Object.keys(players)
-      .map(id => Number(id))
-      .filter(id => id !== playerId);
+    const opponentIds: number[] = [];
+    for (const key of Object.keys(players)) {
+      const id = Number(key);
+      if (id !== playerId) opponentIds.push(id);
+    }
     if (opponentIds.length === 0) return;
 
     set(state => damageAllAction(state, playerId, value));

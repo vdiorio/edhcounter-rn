@@ -1,8 +1,9 @@
 import {partializeGameState, type PersistedGameState} from '../middleware';
-import type {GameStore} from '@/store/gameStore';
+import {useGameStore, type GameStore} from '@/store/gameStore';
 
 function makeFullState(): GameStore {
   return {
+    ...useGameStore.getState(),
     players: {
       0: {
         id: 0,
@@ -31,11 +32,6 @@ function makeFullState(): GameStore {
     alt: false,
     gameLayout: [1, 0, 0, 1],
     startingPlayerId: 0,
-    setNumPlayers: () => {},
-    resetGame: () => {},
-    _scheduleDeltaReset: () => {},
-    incrementLife: () => {},
-    setLife: () => {},
   };
 }
 

@@ -13,9 +13,11 @@ function getClockwiseOrder(state: ReturnType<typeof useGameStore.getState>): num
   const bottom = pieces.filter(p => p.direction === 0).sort((a, b) => b.x - a.x);
   const left = pieces.filter(p => p.direction === 90).sort((a, b) => b.y - a.y);
 
-  return [...top, ...right, ...bottom, ...left]
-    .map(piece => piece.playerId)
-    .filter(id => existing.has(id));
+  const order: number[] = [];
+  for (const piece of [...top, ...right, ...bottom, ...left]) {
+    if (existing.has(piece.playerId)) order.push(piece.playerId);
+  }
+  return order;
 }
 
 export function useStartingPlayer(): {

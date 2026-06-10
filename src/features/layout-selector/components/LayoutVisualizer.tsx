@@ -29,16 +29,16 @@ export function LayoutVisualizer({
         <View
           key={p.playerId}
           testID={`visualizer-cell-${p.playerId}`}
-          style={{
-            position: 'absolute',
-            left: p.x,
-            top: p.y,
-            width: p.width,
-            height: p.height,
-            backgroundColor: palette[p.playerId % palette.length],
-            borderWidth: StyleSheet.hairlineWidth,
-            borderColor: BORDER_COLOR,
-          }}
+          style={[
+            styles.cell,
+            {
+              left: p.x,
+              top: p.y,
+              width: p.width,
+              height: p.height,
+              backgroundColor: palette[p.playerId % palette.length],
+            },
+          ]}
         />
       ))}
     </View>
@@ -52,5 +52,10 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: BORDER_COLOR,
     borderRadius: 8,
+  },
+  cell: {
+    position: 'absolute',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: BORDER_COLOR,
   },
 });

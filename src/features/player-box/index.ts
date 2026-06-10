@@ -1,1 +1,1 @@
-export {};
+export {PlayerBox} from './components/PlayerBox';

@@ -1,6 +1,18 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {BackHandler, Platform, Pressable, StatusBar, StyleSheet, View} from 'react-native';
-import {useFocusEffect, useNavigation, useRoute, type RouteProp} from '@react-navigation/native';
+import {
+  BackHandler,
+  Platform,
+  Pressable,
+  StatusBar,
+  StyleSheet,
+  View,
+} from 'react-native';
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+  type RouteProp,
+} from '@react-navigation/native';
 import KeepAwake from 'react-native-keep-awake';
 import SystemNavigationBar from 'react-native-system-navigation-bar';
 import {useTranslation} from 'react-i18next';
@@ -9,7 +21,8 @@ import {AppModal, Typography} from '@/shared/ui';
 import {useAppColors} from '@/features/theming';
 import {StartingPlayerButton} from '@/features/starting-player-wheel';
 import {useGameStore} from '@/store/gameStore';
-import {LayoutGenerator, PlayerPiece} from '@/features/game-layout';
+import {LayoutGenerator} from '@/features/game-layout';
+import {PlayerBox} from '@/features/player-box';
 import type {RootStackParamList} from '@/app/navigation/types';
 
 type GameNavProp = NativeStackNavigationProp<RootStackParamList, 'Game'>;
@@ -26,7 +39,10 @@ export default function GameScreen(): React.JSX.Element {
   const [confirmVisible, setConfirmVisible] = useState(false);
 
   useEffect(() => {
-    setNumPlayers({playerCount: route.params.numPlayers, alt: route.params.alt});
+    setNumPlayers({
+      playerCount: route.params.numPlayers,
+      alt: route.params.alt,
+    });
   }, [route.params.numPlayers, route.params.alt, setNumPlayers]);
 
   useFocusEffect(
@@ -65,7 +81,7 @@ export default function GameScreen(): React.JSX.Element {
       style={[styles.root, {backgroundColor: colors.background}]}>
       <LayoutGenerator
         renderPiece={({playerId, width, height}) => (
-          <PlayerPiece playerId={playerId} width={width} height={height} />
+          <PlayerBox playerId={playerId} style={{width, height}} />
         )}
       />
 
@@ -75,12 +91,20 @@ export default function GameScreen(): React.JSX.Element {
         visible={confirmVisible}
         onRequestClose={onCancel}
         title={t('alert_back_title')}>
-        <Typography style={styles.modalMessage}>{t('alert_back_message')}</Typography>
+        <Typography style={styles.modalMessage}>
+          {t('alert_back_message')}
+        </Typography>
         <View style={styles.modalActions}>
-          <Pressable testID="confirm-back-cancel" onPress={onCancel} style={styles.modalButton}>
+          <Pressable
+            testID="confirm-back-cancel"
+            onPress={onCancel}
+            style={styles.modalButton}>
             <Typography>{t('alert_cancel')}</Typography>
           </Pressable>
-          <Pressable testID="confirm-back-yes" onPress={onConfirm} style={styles.modalButton}>
+          <Pressable
+            testID="confirm-back-yes"
+            onPress={onConfirm}
+            style={styles.modalButton}>
             <Typography color={colors.primary}>{t('alert_yes')}</Typography>
           </Pressable>
         </View>

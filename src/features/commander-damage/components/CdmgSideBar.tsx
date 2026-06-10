@@ -13,10 +13,14 @@ export function CdmgSideBar({playerId}: Props): React.JSX.Element {
   const players = useGameStore(s => s.players);
   const chain = useGameStore(s => s.players[playerId]?.chain ?? false);
   const togglePlayerChain = useGameStore(s => s.togglePlayerChain);
-  const attackerIds = useMemo(
-    () => Object.keys(players).map(Number).filter(id => id !== playerId),
-    [playerId, players],
-  );
+  const attackerIds = useMemo(() => {
+    const ids: number[] = [];
+    for (const key of Object.keys(players)) {
+      const id = Number(key);
+      if (id !== playerId) ids.push(id);
+    }
+    return ids;
+  }, [playerId, players]);
   const [partnerEnabled, setPartnerEnabled] = useState<Record<number, boolean>>({});
 
   return (
