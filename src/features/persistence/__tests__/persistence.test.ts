@@ -1,6 +1,11 @@
 import {GAME_STORAGE_KEY, type PersistedGameState} from '../middleware';
 import type {GameStore} from '@/store/gameStore';
 
+// These are real-async hydration integration tests that can exceed Jest's
+// default 5s timeout on slower CI runners. Bump the per-test timeout so they
+// don't flake under CI while still passing fast locally.
+jest.setTimeout(20000);
+
 async function freshStore() {
   jest.resetModules();
   const {default: AsyncStorage} = require('@react-native-async-storage/async-storage');
