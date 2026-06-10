@@ -44,8 +44,9 @@ describe('partializeGameState', () => {
   });
 
   it('omits startingPlayerId', () => {
-    const out = partializeGameState(makeFullState()) as Partial<PersistedGameState> &
-      Record<string, unknown>;
+    const out = partializeGameState(
+      makeFullState(),
+    ) as Partial<PersistedGameState> & Record<string, unknown>;
     expect('startingPlayerId' in out).toBe(false);
   });
 

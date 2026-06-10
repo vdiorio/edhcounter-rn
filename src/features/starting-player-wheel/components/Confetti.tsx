@@ -22,7 +22,14 @@ type ParticleSeed = {
   fadeDelay: number;
 };
 
-const PARTICLE_COLORS = ['#F44336', '#FF9800', '#FFEB3B', '#4CAF50', '#2196F3', '#9C27B0'];
+const PARTICLE_COLORS = [
+  '#F44336',
+  '#FF9800',
+  '#FFEB3B',
+  '#4CAF50',
+  '#2196F3',
+  '#9C27B0',
+];
 
 function randomBetween(min: number, max: number): number {
   return min + Math.random() * (max - min);
@@ -39,7 +46,13 @@ function buildSeeds(count: number): ParticleSeed[] {
   }));
 }
 
-function Particle({seed, index}: {seed: ParticleSeed; index: number}): React.JSX.Element {
+function Particle({
+  seed,
+  index,
+}: {
+  seed: ParticleSeed;
+  index: number;
+}): React.JSX.Element {
   const tx = useSharedValue(seed.startX);
   const ty = useSharedValue(0);
   const rotate = useSharedValue(0);
@@ -47,10 +60,19 @@ function Particle({seed, index}: {seed: ParticleSeed; index: number}): React.JSX
 
   tx.value = withDelay(
     seed.startDelay,
-    withTiming(seed.startX + seed.driftX, {duration: 1300, easing: Easing.linear}),
+    withTiming(seed.startX + seed.driftX, {
+      duration: 1300,
+      easing: Easing.linear,
+    }),
   );
-  ty.value = withDelay(seed.startDelay, withTiming(260, {duration: 1300, easing: Easing.linear}));
-  rotate.value = withDelay(seed.startDelay, withTiming(seed.rotation, {duration: 1300}));
+  ty.value = withDelay(
+    seed.startDelay,
+    withTiming(260, {duration: 1300, easing: Easing.linear}),
+  );
+  rotate.value = withDelay(
+    seed.startDelay,
+    withTiming(seed.rotation, {duration: 1300}),
+  );
   opacity.value = withDelay(seed.fadeDelay, withTiming(0, {duration: 200}));
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -70,15 +92,25 @@ function Particle({seed, index}: {seed: ParticleSeed; index: number}): React.JSX
   );
 }
 
-export function Confetti({active, particleCount = 24}: ConfettiProps): React.JSX.Element | null {
-  const seeds = useMemo(() => (active ? buildSeeds(particleCount) : []), [active, particleCount]);
+export function Confetti({
+  active,
+  particleCount = 24,
+}: ConfettiProps): React.JSX.Element | null {
+  const seeds = useMemo(
+    () => (active ? buildSeeds(particleCount) : []),
+    [active, particleCount],
+  );
 
   if (!active) return null;
 
   return (
     <View testID="confetti-root" pointerEvents="none" style={styles.root}>
       {seeds.map((seed, index) => (
-        <Particle key={`${index}-${seed.startX}-${seed.rotation}`} seed={seed} index={index} />
+        <Particle
+          key={`${index}-${seed.startX}-${seed.rotation}`}
+          seed={seed}
+          index={index}
+        />
       ))}
     </View>
   );
