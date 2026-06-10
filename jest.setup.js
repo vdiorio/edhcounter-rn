@@ -16,13 +16,13 @@ jest.mock('react-native-reanimated', () => {
     Image,
     ScrollView,
     FlatList,
-    createAnimatedComponent: (c) => c,
+    createAnimatedComponent: c => c,
   };
-  const useSharedValue = (v) => ({ value: v });
-  const useDerivedValue = (fn) => ({ value: fn() });
-  const useAnimatedStyle = (fn) => fn();
-  const useAnimatedProps = (fn) => fn();
-  const passthrough = (v) => v;
+  const useSharedValue = v => ({value: v});
+  const useDerivedValue = fn => ({value: fn()});
+  const useAnimatedStyle = fn => fn();
+  const useAnimatedProps = fn => fn();
+  const passthrough = v => v;
   return {
     __esModule: true,
     default: Animated,
@@ -37,21 +37,21 @@ jest.mock('react-native-reanimated', () => {
     withRepeat: passthrough,
     withSequence: (...xs) => xs[xs.length - 1],
     cancelAnimation: () => {},
-    runOnJS: (fn) => fn,
-    runOnUI: (fn) => fn,
+    runOnJS: fn => fn,
+    runOnUI: fn => fn,
     interpolate: (value, _input, output) => output[0],
     interpolateColor: (value, _input, output) => output[0],
     Easing: {
-      linear: (t) => t,
-      ease: (t) => t,
-      inOut: (fn) => fn,
-      bezier: () => (t) => t,
+      linear: t => t,
+      ease: t => t,
+      inOut: fn => fn,
+      bezier: () => t => t,
     },
   };
 });
 
 // Worklets mock (Reanimated 4 dependency)
-jest.mock('react-native-worklets', () => ({}), { virtual: true });
+jest.mock('react-native-worklets', () => ({}), {virtual: true});
 
 // Gesture handler mock
 jest.mock('react-native-gesture-handler', () => {
@@ -85,8 +85,8 @@ jest.mock('react-native-gesture-handler', () => {
     Directions: {},
     GestureHandlerRootView: View,
     Gesture: {
-      Pan: () => ({ onUpdate: () => ({}) }),
-      Tap: () => ({ onEnd: () => ({}) }),
+      Pan: () => ({onUpdate: () => ({})}),
+      Tap: () => ({onEnd: () => ({})}),
     },
     GestureDetector: View,
   };
@@ -100,7 +100,7 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 // react-native-localize mock — use jest.fn so tests can override return values
 jest.mock('react-native-localize', () => ({
   getLocales: jest.fn(() => [
-    { countryCode: 'US', languageTag: 'en-US', languageCode: 'en', isRTL: false },
+    {countryCode: 'US', languageTag: 'en-US', languageCode: 'en', isRTL: false},
   ]),
   getCurrencies: jest.fn(() => ['USD']),
   getCountry: jest.fn(() => 'US'),
@@ -130,17 +130,18 @@ jest.mock('react-native-vector-icons/FontAwesome5', () => 'Icon');
 // safe-area-context — render children directly in tests
 jest.mock('react-native-safe-area-context', () => {
   const React = require('react');
-  const { View } = require('react-native');
-  const inset = { top: 0, right: 0, bottom: 0, left: 0 };
-  const frame = { x: 0, y: 0, width: 0, height: 0 };
+  const {View} = require('react-native');
+  const inset = {top: 0, right: 0, bottom: 0, left: 0};
+  const frame = {x: 0, y: 0, width: 0, height: 0};
   return {
-    SafeAreaProvider: ({ children }) => React.createElement(View, null, children),
-    SafeAreaConsumer: ({ children }) => children(inset),
-    SafeAreaView: ({ children, ...props }) => React.createElement(View, props, children),
-    SafeAreaInsetsContext: { Consumer: ({ children }) => children(inset) },
+    SafeAreaProvider: ({children}) => React.createElement(View, null, children),
+    SafeAreaConsumer: ({children}) => children(inset),
+    SafeAreaView: ({children, ...props}) =>
+      React.createElement(View, props, children),
+    SafeAreaInsetsContext: {Consumer: ({children}) => children(inset)},
     useSafeAreaInsets: () => inset,
     useSafeAreaFrame: () => frame,
-    initialWindowMetrics: { insets: inset, frame },
+    initialWindowMetrics: {insets: inset, frame},
   };
 });
 

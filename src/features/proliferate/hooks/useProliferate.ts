@@ -1,7 +1,6 @@
-import {useCallback, useEffect, useRef} from 'react';
-import {LONG_PRESS_DELAY} from '@/shared/constants/ui';
 import {PROLIFERATE_UNDO_INTERVAL} from '@/store/constants/game';
 import {useGameStore} from '@/store/gameStore';
+import {useHoldRepeat} from '@/shared/hooks/useHoldRepeat';
 
 export function useProliferate(playerId: number): {
   onTap: () => void;
@@ -11,46 +10,16 @@ export function useProliferate(playerId: number): {
 } {
   const proliferate = useGameStore(s => s.proliferate);
   const undoProliferate = useGameStore(s => s.undoProliferate);
-  const undoCount = useGameStore(s => s.proliferateUndoCountByPlayer[playerId] ?? 0);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const longPressTriggeredRef = useRef(false);
+  const undoCount = useGameStore(
+    s => s.proliferateUndoCountByPlayer[playerId] ?? 0,
+  );
 
-  const clearTimers = useCallback(() => {
-    if (timeoutRef.current !== null) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
-    }
-    if (intervalRef.current !== null) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-  }, []);
-
-  const onTap = useCallback(() => {
-    if (longPressTriggeredRef.current) {
-      longPressTriggeredRef.current = false;
-      return;
-    }
-    proliferate(playerId);
-  }, [playerId, proliferate]);
-
-  const onPressIn = useCallback(() => {
-    clearTimers();
-    longPressTriggeredRef.current = false;
-    timeoutRef.current = setTimeout(() => {
-      longPressTriggeredRef.current = true;
-      intervalRef.current = setInterval(() => {
-        undoProliferate(playerId);
-      }, PROLIFERATE_UNDO_INTERVAL);
-    }, LONG_PRESS_DELAY);
-  }, [clearTimers, playerId, undoProliferate]);
-
-  const onPressOut = useCallback(() => {
-    clearTimers();
-  }, [clearTimers]);
-
-  useEffect(() => () => clearTimers(), [clearTimers]);
+  // Tap proliferates; holding rewinds one proliferate per interval.
+  const {onTap, onPressIn, onPressOut} = useHoldRepeat({
+    onTap: () => proliferate(playerId),
+    onHoldTick: () => undoProliferate(playerId),
+    intervalMs: PROLIFERATE_UNDO_INTERVAL,
+  });
 
   return {onTap, onPressIn, onPressOut, undoCount};
 }

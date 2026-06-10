@@ -16,7 +16,7 @@ type AppModalProps = {
 
 export function AppModal(props: AppModalProps): JSX.Element;
 
-// src/shared/ui/Typography/index.tsx
+// src/shared/ui/Typography.tsx
 type TypographyProps = AnimatedTextProps & {
   variant?: 'body' | 'title' | 'label';
   color?: string;

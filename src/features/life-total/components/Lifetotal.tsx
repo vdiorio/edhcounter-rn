@@ -12,7 +12,10 @@ type Props = {
   fontSize?: number;
 };
 
-export function Lifetotal({playerId, fontSize = LIFE_FONT_SIZE}: Props): React.JSX.Element {
+export function Lifetotal({
+  playerId,
+  fontSize = LIFE_FONT_SIZE,
+}: Props): React.JSX.Element {
   const lTotal = useGameStore(s => s.players[playerId]?.lTotal ?? 0);
   const delta = useGameStore(s => s.players[playerId]?.delta ?? 0);
   const playerColor = usePlayerColor(playerId);

@@ -17,7 +17,9 @@ function applyLocale(language: 'en' | 'pt'): void {
 async function freshStore(language: 'en' | 'pt' = 'en') {
   jest.resetModules();
   applyLocale(language);
-  const {default: AsyncStorageReloaded} = require('@react-native-async-storage/async-storage');
+  const {
+    default: AsyncStorageReloaded,
+  } = require('@react-native-async-storage/async-storage');
   await AsyncStorageReloaded.clear();
   return {
     module: require('../preferencesStore'),
@@ -31,7 +33,9 @@ async function freshStoreWithSeed(
 ) {
   jest.resetModules();
   applyLocale(language);
-  const {default: AsyncStorageReloaded} = require('@react-native-async-storage/async-storage');
+  const {
+    default: AsyncStorageReloaded,
+  } = require('@react-native-async-storage/async-storage');
   await AsyncStorageReloaded.clear();
   for (const [k, v] of Object.entries(storageSeed)) {
     await AsyncStorageReloaded.setItem(k, v);
@@ -43,7 +47,10 @@ async function freshStoreWithSeed(
 }
 
 async function waitForHydration(store: {
-  persist: {hasHydrated: () => boolean; onFinishHydration: (fn: () => void) => () => void};
+  persist: {
+    hasHydrated: () => boolean;
+    onFinishHydration: (fn: () => void) => () => void;
+  };
 }): Promise<void> {
   if (store.persist.hasHydrated()) return;
   await new Promise<void>(resolve => {
@@ -86,7 +93,10 @@ describe('preferencesStore', () => {
 
   it('rehydrates persisted language on cold start, overriding device locale', async () => {
     const seed = {
-      [PREFERENCES_STORAGE_KEY]: JSON.stringify({state: {language: 'pt'}, version: 0}),
+      [PREFERENCES_STORAGE_KEY]: JSON.stringify({
+        state: {language: 'pt'},
+        version: 0,
+      }),
     };
     const {module} = await freshStoreWithSeed('en', seed);
     await waitForHydration(module.usePreferencesStore);

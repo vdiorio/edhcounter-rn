@@ -1,5 +1,6 @@
 import type {StateCreator} from 'zustand';
 import {CDMG_LIMIT} from '@/store/constants/game';
+import type {CommanderDamageEntry} from '@/store/coreSlice';
 import type {GameStore} from '@/store/gameStore';
 
 const CHAIN_RESET_MS = 500;
@@ -18,14 +19,19 @@ export type CdmgSlice = {
   togglePlayerChain: (playerId: number) => void;
 };
 
-export const createCdmgSlice: StateCreator<GameStore, [], [], CdmgSlice> = (set, get) => ({
+export const createCdmgSlice: StateCreator<GameStore, [], [], CdmgSlice> = (
+  set,
+  get,
+) => ({
   dealCommanderDamage: ({playerId, attackerId, value, partner = false}) => {
     const target = get().players[playerId];
     if (!target) return;
 
     const slotIndex = partner ? 1 : 0;
     const prevTuple = target.Cdmg[attackerId] ?? [0, 0];
-    const nextTuple: [number, number] = [...prevTuple] as [number, number];
+    const nextTuple: CommanderDamageEntry = [
+      ...prevTuple,
+    ] as CommanderDamageEntry;
     nextTuple[slotIndex] = clampCdmg(prevTuple[slotIndex] + value);
     const appliedDelta = nextTuple[slotIndex] - prevTuple[slotIndex];
 

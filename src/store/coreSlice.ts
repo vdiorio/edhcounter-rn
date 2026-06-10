@@ -7,12 +7,19 @@ import {
 } from './constants/game';
 import {getPlayerLayout, type GameLayout} from './constants/playerLayouts';
 
+/**
+ * Commander damage taken from one attacker, as `[commander, partnerCommander]`.
+ * The two slots track a commander and its optional partner separately so the
+ * 21-damage lethal rule (Spec 09) can be evaluated per-commander.
+ */
+export type CommanderDamageEntry = [number, number];
+
 export type Player = {
   id: number;
   lTotal: number;
   delta: number;
   history: number[];
-  Cdmg: Record<number, [number, number]>;
+  Cdmg: Record<number, CommanderDamageEntry>;
   chain: boolean;
   poison: number;
   energy: number;
@@ -63,10 +70,12 @@ function isValidPlayerCount(n: number): boolean {
   return Number.isInteger(n) && n >= MIN_PLAYERS && n <= MAX_PLAYERS;
 }
 
-export const createCoreSlice: StateCreator<CoreSliceState, [], [], CoreSliceState> = (
-  set,
-  get,
-) => {
+export const createCoreSlice: StateCreator<
+  CoreSliceState,
+  [],
+  [],
+  CoreSliceState
+> = (set, get) => {
   // Timers live outside the store — they must not be serialized by persist.
   const timers = new Map<number, ReturnType<typeof setTimeout>>();
 

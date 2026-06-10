@@ -19,7 +19,10 @@ jest.mock('@react-navigation/native-stack', () => {
 
   return {
     createNativeStackNavigator: () => ({
-      Navigator: ({children, ...props}: React.PropsWithChildren<Record<string, unknown>>) => {
+      Navigator: ({
+        children,
+        ...props
+      }: React.PropsWithChildren<Record<string, unknown>>) => {
         mockNavigatorProps(props);
         return ReactMock.createElement(ReactMock.Fragment, null, children);
       },
